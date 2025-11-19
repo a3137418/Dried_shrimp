@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/home"
+        android:title="首頁" />
+    <item
+        android:id="@+id/nav_category"
+        android:icon="@drawable/bag"
+        android:title="商城" />
+    <item
+        android:id="@+id/nav_live"
+        android:icon="@drawable/video_chat"
+        android:title="直播短影音" />
+    <item
+        android:id="@+id/nav_chat"
+        android:icon="@drawable/notification"
+        android:title="通知" />
+    <item
+        android:id="@+id/nav_user"
+        android:icon="@drawable/user"
+        android:title="我的" />
+</menu>

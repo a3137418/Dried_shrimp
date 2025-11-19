@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Dried_shrimp</string>
+    <string name="登入">登入</string>
+    <string name="註冊">註冊</string>
+    <string name="payment">待付款</string>
+    <string name="pending_shipment">待出貨</string>
+    <string name="receiving">待收貨</string>
+    <string name="evaluate">評價</string>
+    <string name="電子票券與繳費">電子票券與繳費</string>
+    <string name="information">雙11滿千現折$300</string>
+    <string name="ticket">神券馬上領</string>
+    <string name="free_delivery">商城優選免運</string>
+    <string name="percent_30">全站最高7折</string>
+    <string name="percent_50">打到你骨折</string>
+    <string name="My_wallet">我的錢包</string>
+    <string name="coin">我的蝦幣</string>
+    <string name="ticket2">我的優惠券</string>
+    <string name="wallet">我的蝦皮錢包</string>
+    <string name="More_services">更多服務</string>
+    <string name="SeeAll">查看全部></string>
+    <string name="Service_and_Support">服務與支援</string>
+    <string name="Buy_and_return">放心買 安心退</string>
+    <string name="Help_Center">幫助中心</string>
+    <string name="customer">與客服即時交談</string>
+    <string name="call_customer">透過免費網路電話聯繫客服</string>
+
+
+</resources>

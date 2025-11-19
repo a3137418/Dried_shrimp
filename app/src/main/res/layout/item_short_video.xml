@@ -1,0 +1,16 @@
+<!-- item_short_video.xml (正確的內容) -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!--
+      關鍵！這裡必須有一個 VideoView 或其子類，
+      並且它的 ID 必須是 "videoView"。
+    -->
+    <com.example.dried_shrimp.FullScreenVideoView
+        android:id="@+id/videoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</FrameLayout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- 背景色：白色 -->
+    <solid android:color="#FFFFFF" /> <!-- 或 #FFFF00 / #FFEB3B -->
+
+    <!-- 外框 -->
+    <stroke
+        android:width="2dp"
+        android:color="#14D9F2" />   <!-- 深黃色或橘色，可調 -->
+
+    <!-- 圓角 -->
+    <corners android:radius="8dp" />
+
+    <!-- 內間距 -->
+    <padding
+        android:left="6dp"
+        android:top="4dp"
+        android:right="6dp"
+        android:bottom="4dp" />
+
+</shape>
