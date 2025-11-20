@@ -23,8 +23,7 @@
     <string name="Help_Center">幫助中心</string>
     <string name="customer">與客服即時交談</string>
     <string name="call_customer">透過免費網路電話聯繫客服</string>
-    <string name="default_web_client_id">
-    235904581358-jcht81r44v6g8b50619oe9gl20f1nipl.apps.googleusercontent.com
-</string>
-
+    <string name="default_web_client_id"></string>
+    <string name="facebook_app_id">862044436364676</string>
+    <string name="facebook_client_token">dfc52bf1f41edbc28af4a6153f96b572</string>
 </resources>

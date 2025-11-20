@@ -9,8 +9,6 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -27,20 +25,25 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.linecorp.linesdk.LineApiResponseCode
-import com.linecorp.linesdk.Scope
-import com.linecorp.linesdk.auth.LineAuthenticationParams
-import com.linecorp.linesdk.auth.LineLoginApi
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.data
+import com.google.firebase.auth.FacebookAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
+
+
 
 class Login : AppCompatActivity() {
     lateinit var binding : ActivityLoginBinding
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var callbackManager: CallbackManager
-
-
-
     private val GOOGLE_SIGN_IN = 9001
+    private val CHANNEL_ID = "1657918020"
+    companion object {
+        private const val LINE_LOGIN_REQUEST_CODE = 1001
+
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -65,29 +68,6 @@ class Login : AppCompatActivity() {
         setlisteners()
         back()
 
-        val loginIntent = LineLoginApi.getLoginIntent(
-            this,
-            CHANNEL_ID,
-            LineAuthenticationParams.Builder().scopes(listOf(Scope.PROFILE)).build()
-        )
-        startActivityForResult(loginIntent, 1)
-
-        LoginManager.getInstance().registerCallback(callbackManager,
-            object : FacebookCallback<LoginResult> {
-                override fun onSuccess(result: LoginResult) {
-                    handleFacebookAccessToken(result.accessToken)
-                }
-                override fun onCancel() {}
-                override fun onError(error: FacebookException) {}
-            }
-        )
-        val result = LineLoginApi.getLoginResultFromIntent(data)
-        if (result.responseCode == LineApiResponseCode.SUCCESS) {
-            val userId = result.lineProfile?.userId
-            val displayName = result.lineProfile?.displayName
-
-            saveUserToDatabaseWithLine(userId, displayName)
-        }
     }
 
     fun initialization(){
@@ -115,11 +95,24 @@ class Login : AppCompatActivity() {
                 listOf("email", "public_profile")
             )
         }
+
+//        binding.btlinelogin.setOnClickListener {
+//            val loginIntent = LineLoginApi.getLoginIntent(
+//                this,
+//                CHANNEL_ID,
+//                LineAuthenticationParams.Builder()
+//                    .scopes(listOf(Scope.PROFILE))
+//                    .build()
+//            )
+//            startActivityForResult(loginIntent, LINE_LOGIN_REQUEST_CODE)
+//        }
+
+
     }
-    //google接收
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        // Google Login
         if (requestCode == GOOGLE_SIGN_IN) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
@@ -129,7 +122,36 @@ class Login : AppCompatActivity() {
                 Toast.makeText(this, "Google 登入失敗", Toast.LENGTH_SHORT).show()
             }
         }
+
+        // LINE Login
+//        if (requestCode == LINE_LOGIN_REQUEST_CODE) {
+//
+//            val result = LineLoginApi.getLoginResultFromIntent(data)
+//
+//            when (result.responseCode) {
+//                LineApiResponseCode.SUCCESS -> {
+//                    val userId = result.lineProfile?.userId
+//                    val name = result.lineProfile?.displayName
+//
+//                    saveUserToDatabaseWithLine(userId, name)
+//
+//                    Toast.makeText(this, "LINE 登入成功", Toast.LENGTH_SHORT).show()
+//                }
+//
+//                LineApiResponseCode.CANCEL -> {
+//                    Toast.makeText(this, "使用者取消登入", Toast.LENGTH_SHORT).show()
+//                }
+//
+//                else -> {
+//                    Toast.makeText(this, "LINE 登入失敗：${result.errorData}", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        }
+
+        // Facebook Login
+        callbackManager.onActivityResult(requestCode, resultCode, data)
     }
+
     //fb接收
     private fun handleFacebookAccessToken(token: AccessToken) {
         val credential = FacebookAuthProvider.getCredential(token.token)
@@ -183,6 +205,15 @@ class Login : AppCompatActivity() {
         tv_register.movementMethod = LinkMovementMethod.getInstance()
         tv_register.highlightColor = Color.TRANSPARENT  // 點擊時不出現藍色底
     }
+
+    fun saveUserToDatabase(user: FirebaseUser?) {
+        // TODO: 寫入你的資料庫邏輯
+    }
+
+    fun saveUserToDatabaseWithLine(id: String?, name: String?) {
+        // TODO: 寫入你的資料庫邏輯
+    }
+
     fun back(){
         val back = binding.loginBack
         back.setOnClickListener {
