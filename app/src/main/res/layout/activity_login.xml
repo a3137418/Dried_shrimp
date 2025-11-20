@@ -20,9 +20,11 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/login_header"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="0dp">
 
             <ImageView
                 android:id="@+id/login_back"
@@ -33,17 +35,23 @@
 
             <TextView
                 android:id="@+id/textView22"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/登入"
                 android:textSize="22sp" />
 
-            <ImageView
-                android:id="@+id/imageView2"
+            <TextView
+                android:id="@+id/textView27"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:text="" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 app:srcCompat="@drawable/question" />
         </LinearLayout>
 
@@ -106,19 +114,19 @@
             android:text="或" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btgooglelogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="使用Google帳號登入" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/btfblogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="使用Facebook帳號登入" />
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/btlinelogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="使用LINE帳號登入" />
@@ -130,21 +138,20 @@
             android:gravity="center"
             android:text="登入後，表示你同意皮蝦的服務條款以及隱私權政策" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/textView38"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_weight="1"
+            android:text="" />
 
-            <TextView
-                android:id="@+id/tv_register"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="還沒有皮蝦帳號嗎?註冊" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tv_register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="還沒有皮蝦帳號嗎?註冊" />
 
     </LinearLayout>
 

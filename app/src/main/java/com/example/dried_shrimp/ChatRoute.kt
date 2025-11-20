@@ -1,5 +1,3 @@
-package com.example.dried_shrimp
-
 package com.example.api
 
 import io.ktor.server.application.*
@@ -13,6 +11,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.serialization.gson.*
 import io.ktor.server.plugins.contentnegotiation.*
 import com.google.gson.JsonObject
+import io.ktor.server.request.receive
 
 fun Application.chatModule() {
 

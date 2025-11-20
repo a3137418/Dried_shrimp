@@ -21,24 +21,30 @@ class register : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_register)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        // 上方 header 避免與狀態列重疊
+        ViewCompat.setOnApplyWindowInsetsListener(binding.registerHeader) { view, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            view.setPadding(view.paddingLeft, statusBarHeight, view.paddingRight, view.paddingBottom)
+            insets
+        }
+        // ⭐ 底部指紋認證區避免被導航列蓋住
+        ViewCompat.setOnApplyWindowInsetsListener(binding.linearLayout2) { view, insets ->
+            val bottomInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, bottomInset)
+            insets
+        }
+        Login_page()
         back()
+    }
 
+    fun Login_page(){
         val tvLogin = binding.tvLogin
-
         val fullText = "已經有皮蝦帳號了嗎?登入"
         val spannable = SpannableString(fullText)
-
         val start = fullText.indexOf("登入")
         val end = start + 2 // "登入"兩個字
-
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 val intent = Intent(this@register, Login::class.java)
@@ -51,15 +57,11 @@ class register : AppCompatActivity() {
                 ds.color = Color.parseColor("#FF7F00") // 設定點擊文字顏色（可改）
             }
         }
-
         spannable.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-
         tvLogin.text = spannable
         tvLogin.movementMethod = LinkMovementMethod.getInstance()
         tvLogin.highlightColor = Color.TRANSPARENT  // 點擊時不出現藍色底
     }
-
-
     fun back(){
         val back = binding.registerBack
         back.setOnClickListener {

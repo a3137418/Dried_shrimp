@@ -23,6 +23,8 @@
     <string name="Help_Center">幫助中心</string>
     <string name="customer">與客服即時交談</string>
     <string name="call_customer">透過免費網路電話聯繫客服</string>
-
+    <string name="default_web_client_id">
+    235904581358-jcht81r44v6g8b50619oe9gl20f1nipl.apps.googleusercontent.com
+</string>
 
 </resources>

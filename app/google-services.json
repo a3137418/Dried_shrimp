@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "235904581358",
+    "project_id": "driedshrimp-1d56d",
+    "storage_bucket": "driedshrimp-1d56d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:235904581358:android:c01041567c9b30d9753dff",
+        "android_client_info": {
+          "package_name": "com.example.dried_shrimp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "235904581358-jcht81r44v6g8b50619oe9gl20f1nipl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPutabhLUHa69MxOXQYaGPGKPf_YkxVDE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "235904581358-jcht81r44v6g8b50619oe9gl20f1nipl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

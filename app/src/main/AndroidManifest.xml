@@ -30,9 +30,6 @@
             android:name=".ShortVideoActivity"
             android:exported="false" />
         <activity
-            android:name=".my"
-            android:exported="false" />
-        <activity
             android:name=".home"
             android:exported="false" />
         <activity
