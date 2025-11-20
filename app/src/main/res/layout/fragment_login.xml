@@ -69,7 +69,7 @@
         app:layout_constraintTop_toBottomOf="@id/imageView7" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/btgoogleregister"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:text="使用 Google 登入"
@@ -79,7 +79,7 @@
         app:layout_constraintTop_toBottomOf="@id/textView24" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/register_btregister"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginTop="12dp"
@@ -114,17 +114,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button4" />
+        app:layout_constraintTop_toBottomOf="@id/btlineregister" />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/btlineregister"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:text="使用 LINE 登入"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button3" />
+        app:layout_constraintTop_toBottomOf="@id/btfbregister" />
 
     <TextView
         android:id="@+id/textView25"
@@ -147,7 +147,7 @@
         android:text="使用 SMS 簡訊登入"
         android:textColor="@android:color/holo_blue_dark"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button" />
+        app:layout_constraintTop_toBottomOf="@id/register_btregister" />
 
     <ImageView
         android:id="@+id/imageView7"
@@ -162,14 +162,14 @@
         app:srcCompat="@drawable/shop_image" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/btfbregister"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:text="使用 Facebook 登入"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button2" />
+        app:layout_constraintTop_toBottomOf="@id/btgoogleregister" />
 
     <TextView
         android:id="@+id/tv_register"

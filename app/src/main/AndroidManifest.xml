@@ -18,25 +18,40 @@
         <!-- 👆👆👆 程式碼到此結束 👆👆👆 -->
         <activity
             android:name=".register"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".Activity_more_serve"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".Login"
-            android:exported="false" />
+            android:launchMode="singleTask"
+            android:exported="true">
+            <!-- ⭐ LINE 回跳用的 Redirect URI 設定（必要） -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- ⚠️ schema 必須跟你 LINE Developers 後台設定的 Callback URL 一致！ -->
+                <data
+                    android:scheme="line3rdparty.com.example.dried_shrimp"
+                    android:host="oauth" />
+            </intent-filter>
+
+        </activity>
+
         <activity
             android:name=".Tabbed_purchase_list"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".more_Serve"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".ShortVideoActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".home"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

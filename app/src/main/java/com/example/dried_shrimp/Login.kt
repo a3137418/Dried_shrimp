@@ -2,6 +2,7 @@ package com.example.dried_shrimp
 
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -17,10 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.dried_shrimp.databinding.ActivityLoginBinding
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
 import com.facebook.login.LoginManager
-import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -29,7 +27,7 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-
+import java.net.URLEncoder
 
 
 class Login : AppCompatActivity() {
@@ -37,11 +35,6 @@ class Login : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var callbackManager: CallbackManager
     private val GOOGLE_SIGN_IN = 9001
-    private val CHANNEL_ID = "1657918020"
-    companion object {
-        private const val LINE_LOGIN_REQUEST_CODE = 1001
-
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,6 +58,7 @@ class Login : AppCompatActivity() {
         }
         Registration_page()
         initialization()
+
         setlisteners()
         back()
 
@@ -77,10 +71,8 @@ class Login : AppCompatActivity() {
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
-
         //fb初始化
         callbackManager = CallbackManager.Factory.create()
-
     }
 
     //設定監聽
@@ -96,18 +88,9 @@ class Login : AppCompatActivity() {
             )
         }
 
-//        binding.btlinelogin.setOnClickListener {
-//            val loginIntent = LineLoginApi.getLoginIntent(
-//                this,
-//                CHANNEL_ID,
-//                LineAuthenticationParams.Builder()
-//                    .scopes(listOf(Scope.PROFILE))
-//                    .build()
-//            )
-//            startActivityForResult(loginIntent, LINE_LOGIN_REQUEST_CODE)
-//        }
-
-
+        binding.btlinelogin.setOnClickListener {
+            lineLogin()
+        }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -122,32 +105,6 @@ class Login : AppCompatActivity() {
                 Toast.makeText(this, "Google 登入失敗", Toast.LENGTH_SHORT).show()
             }
         }
-
-        // LINE Login
-//        if (requestCode == LINE_LOGIN_REQUEST_CODE) {
-//
-//            val result = LineLoginApi.getLoginResultFromIntent(data)
-//
-//            when (result.responseCode) {
-//                LineApiResponseCode.SUCCESS -> {
-//                    val userId = result.lineProfile?.userId
-//                    val name = result.lineProfile?.displayName
-//
-//                    saveUserToDatabaseWithLine(userId, name)
-//
-//                    Toast.makeText(this, "LINE 登入成功", Toast.LENGTH_SHORT).show()
-//                }
-//
-//                LineApiResponseCode.CANCEL -> {
-//                    Toast.makeText(this, "使用者取消登入", Toast.LENGTH_SHORT).show()
-//                }
-//
-//                else -> {
-//                    Toast.makeText(this, "LINE 登入失敗：${result.errorData}", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
-
         // Facebook Login
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
@@ -206,12 +163,42 @@ class Login : AppCompatActivity() {
         tv_register.highlightColor = Color.TRANSPARENT  // 點擊時不出現藍色底
     }
 
+    private fun lineLogin() {
+
+        val CHANNEL_ID = "1657918020"
+        val REDIRECT_URI = "line3rdparty.com.example.dried_shrimp://oauth"
+
+        val url =
+            "intent://access.line.me/oauth2/v2.1/authorize" +
+                    "?response_type=code" +
+                    "&client_id=$CHANNEL_ID" +
+                    "&redirect_uri=${URLEncoder.encode(REDIRECT_URI, "UTF-8")}" +
+                    "&state=1234abcd" +
+                    "&scope=profile%20openid%20email" +
+                    "#Intent;package=jp.naver.line.android;end"
+
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(intent)
+    }
+
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        val uri = intent.data ?: return
+
+        if (uri.scheme == "line3rdparty.com.example.dried_shrimp") {
+            val code = uri.getQueryParameter("code")
+            Toast.makeText(this, "LINE 回傳 code = $code", Toast.LENGTH_LONG).show()
+        }
+    }
+
     fun saveUserToDatabase(user: FirebaseUser?) {
-        // TODO: 寫入你的資料庫邏輯
+
     }
 
     fun saveUserToDatabaseWithLine(id: String?, name: String?) {
-        // TODO: 寫入你的資料庫邏輯
+
     }
 
     fun back(){

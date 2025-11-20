@@ -73,10 +73,10 @@
             android:inputType="text" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/register_btregister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="登入" />
+            android:text="@string/註冊" />
 
 
 
@@ -90,19 +90,19 @@
             android:text="或" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btgoogleregister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="使用Google帳號註冊" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/btfbregister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="使用Facebook帳號註冊" />
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/btlineregister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="使用LINE帳號註冊" />

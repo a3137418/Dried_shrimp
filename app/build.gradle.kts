@@ -52,9 +52,6 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation(libs.firebase.database)
 
-    // LINE SDK (新版本)
-
-
     // Facebook SDK
     implementation("com.facebook.android:facebook-login:latest.release")
 
