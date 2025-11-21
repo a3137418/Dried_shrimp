@@ -47,7 +47,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="" />
-
+            <ImageView
+                android:id="@+id/imageView21"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/imageView2"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/building" />
             <ImageView
                 android:id="@+id/imageView2"
                 android:layout_width="30dp"
@@ -64,11 +71,11 @@
             app:srcCompat="@drawable/shop_image" />
 
         <EditText
-            android:id="@+id/editTextText"
+            android:id="@+id/login_etaccount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="電話號碼/Email/使用者帳號"
+            android:hint="帳號"
             android:inputType="text" />
 
         <LinearLayout
@@ -77,7 +84,7 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/editTextText2"
+                android:id="@+id/login_etpasswword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -113,23 +120,66 @@
             android:gravity="center"
             android:text="或" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btgooglelogin"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="使用Google帳號登入" />
+            android:layout_height="48dp"
+            android:text="@string/google_login"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_login_button"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
 
-        <Button
+            app:icon="@drawable/google"
+            app:iconGravity="textStart"
+            app:iconTint="@null"
+            app:iconPadding="8dp"
+            app:iconSize="20dp" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btfblogin"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="使用Facebook帳號登入" />
+            android:layout_height="48dp"
+            android:text="@string/fb_login"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_login_button"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
 
-        <Button
+            app:icon="@drawable/fb"
+            app:iconGravity="textStart"
+            app:iconTint="@null"
+            app:iconPadding="8dp"
+            app:iconSize="20dp"/>
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btlinelogin"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="使用LINE帳號登入" />
+            android:layout_height="48dp"
+            android:text="@string/line_login"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_login_button"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+
+            app:icon="@drawable/line"
+            app:iconGravity="textStart"
+            app:iconTint="@null"
+            app:iconPadding="8dp"
+            app:iconSize="20dp" />
+
 
         <TextView
             android:id="@+id/textView26"
@@ -190,6 +240,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:thumbTint="@color/switch_thumb_color"
+            android:trackTint="@color/switch_track_color"
             android:layout_weight="1" />
     </LinearLayout>
 

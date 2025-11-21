@@ -24,10 +24,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.database
 import java.net.URLEncoder
 
 class register : AppCompatActivity() {
@@ -35,7 +38,9 @@ class register : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var callbackManager: CallbackManager
     private val GOOGLE_SIGN_IN = 9001
-
+    private val user_datas: MutableList<Map<String, Map<String, Any>>> = mutableListOf()
+    val database = Firebase.database
+    val myRef = database.getReference("message")
 
 
 
@@ -60,7 +65,72 @@ class register : AppCompatActivity() {
         setlisteners()
         Login_page()
         back()
+
     }
+    fun Account_Registration() {
+        val account = binding.registerEtaccount.text.toString().trim()
+        val password = binding.registerEtpasswword.text.toString().trim()
+        val phone = binding.registerEtphone.text.toString().trim()
+
+        // 基本欄位判斷
+        if (account.isEmpty() || password.isEmpty() || phone.isEmpty()) {
+            Toast.makeText(this, "請輸入所有欄位", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (password.length < 4) {
+            Toast.makeText(this, "密碼至少 4 碼", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 🔥 送到 Firebase 建立帳號
+        registerUser(account, password, phone)
+    }
+
+
+    private fun registerUser(account: String, password: String, phone: String) {
+        FirebaseAuth.getInstance()
+            .createUserWithEmailAndPassword(account, password)
+            .addOnCompleteListener { task ->
+
+                if (task.isSuccessful) {
+                    val uid = task.result.user!!.uid
+                    saveUserProfile(uid, account, phone)
+                } else {
+                    Toast.makeText(this, "註冊失敗：${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun saveUserProfile(uid: String, account: String, phone: String) {
+
+        val database = FirebaseDatabase.getInstance().reference
+        val userData = mapOf(
+            "account" to account,
+            "phone" to phone,
+            "createTime" to System.currentTimeMillis()
+        )
+
+        database.child("users").child(uid).setValue(userData)
+            .addOnSuccessListener {
+                Toast.makeText(this, "註冊成功", Toast.LENGTH_SHORT).show()
+
+                // 註冊成功 → 回登入頁或回主畫面
+                startActivity(Intent(this, Login::class.java))
+                finish()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "資料儲存失敗", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+
+
+
+
+
+
     fun initialization(){
         //google初始化
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -73,17 +143,25 @@ class register : AppCompatActivity() {
     }
     //設定監聽
     fun setlisteners() {
+        //一般帳號註冊
+        binding.registerBtregister.setOnClickListener {
+            Account_Registration()
+        }
+
+
+        //google登入
         binding.btgoogleregister.setOnClickListener {
             val signInIntent = googleSignInClient.signInIntent
             startActivityForResult(signInIntent, GOOGLE_SIGN_IN)
         }
+        //fb註冊
         binding.btfbregister.setOnClickListener {
             LoginManager.getInstance().logInWithReadPermissions(
                 this,
                 listOf("email", "public_profile")
             )
         }
-
+        //line註冊未完成
         binding.btlineregister.setOnClickListener {
             lineLogin()
         }

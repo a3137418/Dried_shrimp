@@ -65,7 +65,31 @@
             app:srcCompat="@drawable/shop_image" />
 
         <EditText
-            android:id="@+id/editTextText"
+            android:id="@+id/register_etaccount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:hint="電子信箱" />
+
+        <EditText
+            android:id="@+id/register_etpasswword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="密碼"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/register_etpasswword2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="密碼確認"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/register_etphone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -89,23 +113,65 @@
             android:gravity="center"
             android:text="或" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btgoogleregister"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="使用Google帳號註冊" />
+            android:layout_height="48dp"
+            android:text="@string/google_register"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_login_button"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
 
-        <Button
+            app:icon="@drawable/google"
+            app:iconGravity="textStart"
+            app:iconTint="@null"
+            app:iconPadding="8dp"
+            app:iconSize="20dp"/>
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btfbregister"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="使用Facebook帳號註冊" />
+            android:layout_height="48dp"
+            android:text="@string/fb_register"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_login_button"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
 
-        <Button
+            app:icon="@drawable/fb"
+            app:iconGravity="textStart"
+            app:iconTint="@null"
+            app:iconPadding="8dp"
+            app:iconSize="20dp"/>
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btlineregister"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="使用LINE帳號註冊" />
+            android:layout_height="48dp"
+            android:text="@string/line_register"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_login_button"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+
+            app:icon="@drawable/line"
+            app:iconGravity="textStart"
+            app:iconTint="@null"
+            app:iconPadding="8dp"
+            app:iconSize="20dp"/>
 
         <TextView
             android:id="@+id/textView26"
@@ -166,6 +232,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:thumbTint="@color/switch_thumb_color"
+            android:trackTint="@color/switch_track_color"
             android:layout_weight="1" />
     </LinearLayout>
 

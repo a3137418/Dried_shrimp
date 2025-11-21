@@ -8,7 +8,6 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 class Tabbed_purchase_list : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tabbed_purchase_list)
@@ -20,7 +19,10 @@ class Tabbed_purchase_list : AppCompatActivity() {
         val adapter = PurchasePagerAdapter(this)
         viewPager.adapter = adapter
 
+
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            val index = intent.getIntExtra("tab_index", 0)
+            viewPager.currentItem = index
             tab.text = when (position) {
                 0 -> "待付款"
                 1 -> "待出貨"
@@ -34,7 +36,6 @@ class Tabbed_purchase_list : AppCompatActivity() {
 
         back()
     }
-
     fun back(){
         val back = findViewById<ImageView>(R.id.purchase_img_back)
         back.setOnClickListener {

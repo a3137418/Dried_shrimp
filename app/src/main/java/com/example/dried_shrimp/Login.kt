@@ -27,6 +27,7 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.FirebaseDatabase
 import java.net.URLEncoder
 
 
@@ -35,6 +36,7 @@ class Login : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var callbackManager: CallbackManager
     private val GOOGLE_SIGN_IN = 9001
+    private lateinit var auth: FirebaseAuth
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +44,7 @@ class Login : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        auth = FirebaseAuth.getInstance()
         // 讓底部認證區往上推
         // 上方 header 避免與狀態列重疊
         ViewCompat.setOnApplyWindowInsetsListener(binding.loginHeader) { view, insets ->
@@ -63,6 +66,74 @@ class Login : AppCompatActivity() {
         back()
 
     }
+    private fun loginUser(account: String, password: String) {
+        FirebaseAuth.getInstance()
+            .signInWithEmailAndPassword(account, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "登入成功", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finish() // 不讓使用者按返回回到登入頁
+                } else {
+                    Toast.makeText(this, "登入失敗：${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+    private fun loadUserData() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        FirebaseDatabase.getInstance().reference
+            .child("users").child(uid)
+            .get()
+            .addOnSuccessListener { snap ->
+                val phone = snap.child("phone").value
+                val account = snap.child("account").value
+
+            }
+    }
+
+    private fun loginUser() {
+        val email = binding.loginEtaccount.text.toString().trim()
+        val password = binding.loginEtpasswword.text.toString().trim()
+
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "請輸入帳號與密碼", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // ✅ 驗證成功，取得目前使用者
+                    val user = auth.currentUser
+                    Toast.makeText(this, "登入成功：${user?.email}", Toast.LENGTH_SHORT).show()
+
+                    // 這裡可以跳到首頁或關閉登入頁
+                    goToUser2()
+                     finish()
+                } else {
+                    // ❌ 驗證失敗
+                    val msg = task.exception?.message ?: "未知錯誤"
+                    Toast.makeText(this, "登入失敗：$msg", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun goToUser2() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra("Login_successful", "fragment_user2")   // 給 MainActivity 的提示
+        }
+        startActivity(intent)
+        finish()  // 通常關掉 Login 頁
+    }
+
+
+
+
+
+
+
 
     fun initialization(){
         //google初始化
@@ -77,17 +148,26 @@ class Login : AppCompatActivity() {
 
     //設定監聽
     fun setlisteners() {
+        //一般登入
+        binding.loginBtlogin.setOnClickListener {
+            val account = binding.loginEtaccount.text.toString().trim()
+            val password = binding.loginEtpasswword.text.toString().trim()
+            loginUser()
+
+        }
+        //google登入
         binding.btgooglelogin.setOnClickListener {
             val signInIntent = googleSignInClient.signInIntent
             startActivityForResult(signInIntent, GOOGLE_SIGN_IN)
         }
+        //fb登入
         binding.btfblogin.setOnClickListener {
             LoginManager.getInstance().logInWithReadPermissions(
                 this,
                 listOf("email", "public_profile")
             )
         }
-
+        //line登入未完成
         binding.btlinelogin.setOnClickListener {
             lineLogin()
         }
@@ -197,9 +277,6 @@ class Login : AppCompatActivity() {
 
     }
 
-    fun saveUserToDatabaseWithLine(id: String?, name: String?) {
-
-    }
 
     fun back(){
         val back = binding.loginBack

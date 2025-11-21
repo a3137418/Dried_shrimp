@@ -26,4 +26,11 @@
     <string name="default_web_client_id"></string>
     <string name="facebook_app_id">862044436364676</string>
     <string name="facebook_client_token">dfc52bf1f41edbc28af4a6153f96b572</string>
+    <string name="google_login">使用Google帳號登入</string>
+    <string name="fb_login">使用Facebook帳號登入</string>
+    <string name="line_login">使用LINE帳號登入</string>
+    <string name="google_register">使用Google帳號註冊</string>
+    <string name="fb_register">使用Facebook帳號註冊</string>
+    <string name="line_register">使用LINE帳號註冊</string>
+    <string name="shopping_completed">已完成</string>
 </resources>

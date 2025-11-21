@@ -117,17 +117,17 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/img_evaluate"
+                    android:id="@+id/img_shopping_completed"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    app:srcCompat="@drawable/evaluate" />
+                    app:srcCompat="@drawable/shopping_completed" />
 
                 <TextView
                     android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/evaluate" />
+                    android:text="@string/shopping_completed" />
             </LinearLayout>
         </LinearLayout>
 
