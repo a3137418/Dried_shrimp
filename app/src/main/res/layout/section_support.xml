@@ -32,6 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:textColor="@color/black"
             android:text="@string/Buy_and_return" />
     </LinearLayout>
 
@@ -52,6 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:textColor="@color/black"
             android:text="@string/Help_Center" />
     </LinearLayout>
 
@@ -72,6 +74,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:textColor="@color/black"
             android:text="@string/customer" />
     </LinearLayout>
 
@@ -92,6 +95,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:textColor="@color/black"
             android:text="@string/call_customer" />
     </LinearLayout>
 

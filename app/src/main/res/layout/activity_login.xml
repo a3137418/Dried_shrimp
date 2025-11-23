@@ -5,14 +5,15 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     android:layout_margin="12dp">
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="vertical"
-        android:layout_marginBottom="50dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -39,6 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/登入"
+                android:textColor="@color/black"
                 android:textSize="22sp" />
 
             <TextView
@@ -47,6 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="" />
+
             <ImageView
                 android:id="@+id/imageView21"
                 android:layout_width="30dp"
@@ -55,6 +58,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/imageView2"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/building" />
+
             <ImageView
                 android:id="@+id/imageView2"
                 android:layout_width="30dp"
@@ -83,19 +87,34 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/login_etpasswword"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:layout_weight="1"
-                android:hint="密碼"
-                android:inputType="text" />
+                android:hint="@string/password"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/login_etpasswword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
 
             <TextView
                 android:id="@+id/textView25"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="忘記密碼?" />
+                android:text="忘記密碼?"
+                android:textColor="@color/black" />
         </LinearLayout>
 
         <Button
@@ -109,7 +128,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="right"
-            android:text="使用SMS簡訊登入" />
+            android:text="使用SMS簡訊登入"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/textView24"
@@ -118,67 +138,68 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:text="或" />
+            android:text="或"
+            android:textColor="@color/black" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btgooglelogin"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:background="@drawable/bg_login_button"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp"
             android:text="@string/google_login"
             android:textAllCaps="false"
-            android:gravity="center"
             android:textColor="@color/black"
-            android:background="@drawable/bg_login_button"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
 
             app:icon="@drawable/google"
             app:iconGravity="textStart"
-            app:iconTint="@null"
             app:iconPadding="8dp"
-            app:iconSize="20dp" />
+            app:iconSize="20dp"
+            app:iconTint="@null" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btfblogin"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:background="@drawable/bg_login_button"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp"
             android:text="@string/fb_login"
             android:textAllCaps="false"
-            android:gravity="center"
             android:textColor="@color/black"
-            android:background="@drawable/bg_login_button"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
 
             app:icon="@drawable/fb"
             app:iconGravity="textStart"
-            app:iconTint="@null"
             app:iconPadding="8dp"
-            app:iconSize="20dp"/>
+            app:iconSize="20dp"
+            app:iconTint="@null" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btlinelogin"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:background="@drawable/bg_login_button"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp"
             android:text="@string/line_login"
             android:textAllCaps="false"
-            android:gravity="center"
             android:textColor="@color/black"
-            android:background="@drawable/bg_login_button"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
 
             app:icon="@drawable/line"
             app:iconGravity="textStart"
-            app:iconTint="@null"
             app:iconPadding="8dp"
-            app:iconSize="20dp" />
+            app:iconSize="20dp"
+            app:iconTint="@null" />
 
 
         <TextView
@@ -186,7 +207,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="登入後，表示你同意皮蝦的服務條款以及隱私權政策" />
+            android:text="登入後，表示你同意皮蝦的服務條款以及隱私權政策"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/textView38"
@@ -201,14 +223,16 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="還沒有皮蝦帳號嗎?註冊" />
+            android:text="還沒有皮蝦帳號嗎?註冊"
+            android:textColor="@color/black" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -226,7 +250,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="啟用指紋認證" />
+            android:text="啟用指紋認證"
+            android:textColor="@color/black" />
 
         <ImageView
             android:id="@+id/imageView17"
@@ -240,9 +265,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_weight="1"
             android:thumbTint="@color/switch_thumb_color"
-            android:trackTint="@color/switch_track_color"
-            android:layout_weight="1" />
+            android:trackTint="@color/switch_track_color" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

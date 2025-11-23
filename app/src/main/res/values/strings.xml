@@ -33,4 +33,6 @@
     <string name="fb_register">使用Facebook帳號註冊</string>
     <string name="line_register">使用LINE帳號註冊</string>
     <string name="shopping_completed">已完成</string>
+    <string name="password">密碼</string>
+    <string name="Password_Confirmation">密碼確認</string>
 </resources>
