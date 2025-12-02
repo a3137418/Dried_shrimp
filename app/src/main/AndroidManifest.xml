@@ -11,11 +11,19 @@
         android:roundIcon="@drawable/prawn"
         android:supportsRtl="true"
         android:theme="@style/Theme.Dried_shrimp">
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <activity
+            android:name=".shopping_cart"
+            android:exported="false" />
+        <activity
+            android:name=".Account_setting"
+            android:exported="false" />
 
-        <!-- 2. 放入您的 Facebook Client Token -->
-        <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
-        <!-- 👆👆👆 程式碼到此結束 👆👆👆 -->
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" /> <!-- 2. 放入您的 Facebook Client Token -->
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="@string/facebook_client_token" /> <!-- 👆👆👆 程式碼到此結束 👆👆👆 -->
         <activity
             android:name=".register"
             android:exported="true" />
@@ -24,22 +32,22 @@
             android:exported="true" />
         <activity
             android:name=".Login"
-            android:launchMode="singleTask"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTask">
+
             <!-- ⭐ LINE 回跳用的 Redirect URI 設定（必要） -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- ⚠️ schema 必須跟你 LINE Developers 後台設定的 Callback URL 一致！ -->
                 <data
-                    android:scheme="line3rdparty.com.example.dried_shrimp"
-                    android:host="oauth" />
+                    android:host="oauth"
+                    android:scheme="line3rdparty.com.example.dried_shrimp" />
             </intent-filter>
-
         </activity>
-
         <activity
             android:name=".Tabbed_purchase_list"
             android:exported="true" />

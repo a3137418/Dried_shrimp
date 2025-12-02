@@ -29,7 +29,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 import java.net.URLEncoder
-
+import com.google.firebase.database.ServerValue
 
 class Login : AppCompatActivity() {
     lateinit var binding : ActivityLoginBinding
@@ -189,7 +189,7 @@ class Login : AppCompatActivity() {
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
-    //fb接收
+    //fb登入
     private fun handleFacebookAccessToken(token: AccessToken) {
         val credential = FacebookAuthProvider.getCredential(token.token)
 
@@ -200,6 +200,7 @@ class Login : AppCompatActivity() {
                 }
             }
     }
+    //google登入
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
 
@@ -213,7 +214,6 @@ class Login : AppCompatActivity() {
                 }
             }
     }
-
 
     fun Registration_page(){
         val tv_register = binding.tvRegister
@@ -274,7 +274,36 @@ class Login : AppCompatActivity() {
     }
 
     fun saveUserToDatabase(user: FirebaseUser?) {
+        if (user == null) return
 
+        val uid = user.uid
+        val name = user.displayName ?: "皮蝦用戶"
+        val email = user.email ?: ""
+        val photoUrl = user.photoUrl?.toString() ?: ""
+
+        // 取第一個登入方式當作 provider
+        val provider = user.providerData
+            .firstOrNull { it.providerId != "firebase" }
+            ?.providerId ?: "unknown"
+
+        val userData = mapOf(
+            "uid" to uid,
+            "displayName" to name,
+            "email" to email,
+            "photoUrl" to photoUrl,
+            "provider" to provider,
+            "lastLoginAt" to ServerValue.TIMESTAMP
+        )
+
+        val dbRef = FirebaseDatabase.getInstance().getReference("users").child(uid)
+        dbRef.updateChildren(userData)
+            .addOnSuccessListener {
+                // 這裡可以跳頁、更新 UI
+                Toast.makeText(this, "登入成功，資料已更新", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "使用者資料儲存失敗：${it.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
 

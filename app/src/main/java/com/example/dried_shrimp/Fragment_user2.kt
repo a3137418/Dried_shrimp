@@ -12,71 +12,57 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dried_shrimp.databinding.FragmentUser2Binding
 import com.google.firebase.auth.FirebaseAuth
 
-class Fragment_user2: Fragment(){
-    private var binding: FragmentUser2Binding ?= null
+class Fragment_user2 : Fragment() {
+
+    private var binding: FragmentUser2Binding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentUser2Binding.inflate(inflater,container,false)
-        val view =binding?.root
-        return view
-
+        binding = FragmentUser2Binding.inflate(inflater, container, false)
+        return binding!!.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        updateUserUi()
+
         setupRecyclerViews()
-        setlisteners()
-
-
+        setListeners()
+        updateUserUi()
     }
+
     override fun onResume() {
         super.onResume()
         // 從 Login / register 回來時再更新一次
         updateUserUi()
     }
 
+    /**
+     * 根據 Firebase 使用者狀態切換「未登入 / 已登入」版面
+     */
     private fun updateUserUi() {
+        val b = binding ?: return
         val user = FirebaseAuth.getInstance().currentUser
-        val userContainer = binding?.userLayoutContainer
 
-        // 先清掉舊的
-        userContainer?.removeAllViews()
+        // 這兩個是 <include> 對應的 binding
+        val guestRoot = b.viewUserGuest.root
+        val loginRoot = b.viewUserLogin.root
 
         if (user == null) {
-            // 未登入：載入 guest layout
-            val guestView = layoutInflater.inflate(
-                R.layout.view_user_guest,
-                userContainer,
-                false
-            )
-            userContainer?.addView(guestView)
-
-            val btnLogin = guestView.findViewById<Button>(R.id.btnLogin)
-            val btnRegister = guestView.findViewById<Button>(R.id.btnRegister)
-
-            btnLogin.setOnClickListener {
-                startActivity(Intent(requireContext(), Login::class.java))
-            }
-            btnRegister.setOnClickListener {
-                startActivity(Intent(requireContext(), register::class.java))
-            }
-
+            // 未登入：顯示 guest，隱藏 login
+            guestRoot.visibility = View.VISIBLE
+            loginRoot.visibility = View.GONE
         } else {
-            // 已登入：載入 login layout
-            val loginView = layoutInflater.inflate(
-                R.layout.view_user_login,
-                userContainer,
-                false
-            )
-            userContainer?.addView(loginView)
+            // 已登入：顯示 login，隱藏 guest
+            guestRoot.visibility = View.GONE
+            loginRoot.visibility = View.VISIBLE
 
-            val tvUserName = loginView.findViewById<TextView>(R.id.tvUserName)
-            val tvUserEmail = loginView.findViewById<TextView>(R.id.tvUserEmail)
-            val btnLogout = loginView.findViewById<Button>(R.id.btnLogout)
+            // 已登入 layout 裡的元件
+            val tvUserName: TextView = b.viewUserLogin.tvUserName
+            val tvUserEmail: TextView = b.viewUserLogin.tvUserEmail
+            val btnLogout: Button = b.viewUserLogin.btnLogout
 
             tvUserName.text = user.displayName ?: "皮蝦用戶"
             tvUserEmail.text = user.email ?: ""
@@ -88,86 +74,87 @@ class Fragment_user2: Fragment(){
         }
     }
 
-
-
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
-    }
-
+    /**
+     * 設定 RecyclerView（更多服務 / 猜你喜歡）
+     */
     private fun setupRecyclerViews() {
-        val myserive_Adapter = user_serive_Adapter()
-        binding?.sectionMoreServices?.myRecycleServe?.layoutManager = GridLayoutManager(requireContext(), 2)
-        binding?.sectionMoreServices?.myRecycleServe?.adapter = myserive_Adapter
+        val b = binding ?: return
+
+        val myServiceAdapter = user_serive_Adapter()
+        b.sectionMoreServices.myRecycleServe.layoutManager =
+            GridLayoutManager(requireContext(), 2)
+        b.sectionMoreServices.myRecycleServe.adapter = myServiceAdapter
 
         val customAdapter = guesslike_Adapter()
-        binding?.sectionGuesslike?.myRecycleLike?.layoutManager = GridLayoutManager(requireContext(),2)
-        binding?.sectionGuesslike?.myRecycleLike?.adapter = customAdapter
-    }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+        b.sectionGuesslike.myRecycleLike.layoutManager =
+            GridLayoutManager(requireContext(), 2)
+        b.sectionGuesslike.myRecycleLike.adapter = customAdapter
     }
 
-    fun setlisteners(){
-        //登入
-        val btlogin: Button ?= binding?.viewUserGuest?.btnLogin
-        btlogin?.setOnClickListener {
-            val intent = Intent(requireContext(), Login::class.java)
-            startActivity(intent)
+    /**
+     * 其它點擊事件（登入 / 註冊 / 購買清單 tab / 更多服務）
+     */
+    private fun setListeners() {
+        val b = binding ?: return
+
+        // 🔹 未登入版的登入 / 註冊按鈕（view_user_guest.xml 裡的）
+        b.viewUserGuest.btnLogin.setOnClickListener {
+            startActivity(Intent(requireContext(), Login::class.java))
         }
-        //註冊
-        val btregister: Button ?= binding?.viewUserGuest?.btnRegister
-        btregister?.setOnClickListener {
-            val intent = Intent(requireContext(), register::class.java)
-            startActivity(intent)
-        }
-        //待付款
-        val img_payment = binding?.sectionPurchaseList?.imgPayment
-        img_payment?.setOnClickListener {
-            val intent_tab = Intent(context, Tabbed_purchase_list::class.java)
-            intent_tab.putExtra("tab_index", 0)   // 要打開的 Tab 位置
-            startActivity(intent_tab)
-        }
-        //待出貨
-        val img_pending_shipment = binding?.sectionPurchaseList?.imgPendingShipment
-        img_pending_shipment?.setOnClickListener {
-            val intent_tab = Intent(context, Tabbed_purchase_list::class.java)
-            intent_tab.putExtra("tab_index", 1)   // 要打開的 Tab 位置
-            startActivity(intent_tab)
-        }
-        //待收貨
-        val img_receiving = binding?.sectionPurchaseList?.imgReceiving
-        img_receiving?.setOnClickListener {
-            val intent_tab = Intent(context, Tabbed_purchase_list::class.java)
-            intent_tab.putExtra("tab_index", 2)   // 要打開的 Tab 位置
-            startActivity(intent_tab)
-        }
-        //評價
-        val img_shopping_completed = binding?.sectionPurchaseList?.imgShoppingCompleted
-        img_shopping_completed?.setOnClickListener {
-            val intent_tab = Intent(context, Tabbed_purchase_list::class.java)
-            intent_tab.putExtra("tab_index", 3)   // 要打開的 Tab 位置
-            startActivity(intent_tab)
+        b.viewUserGuest.btnRegister.setOnClickListener {
+            startActivity(Intent(requireContext(), register::class.java))
         }
 
-        //購買清單_查看全部
-        val tvseeall1_textview : TextView? = binding?.sectionPurchaseList?.tvseeall1
-        tvseeall1_textview?.setOnClickListener {
+        // 🔹 右上角設定 icon
+        b.imgSetting.setOnClickListener {
+            startActivity(Intent(requireContext(), Account_setting::class.java))
+        }
+
+        // 🔹 購買清單 四個狀態 → 對應 Tabbed_purchase_list 的不同 Tab
+
+        // 待付款
+        b.sectionPurchaseList.imgPayment.setOnClickListener {
+            val intentTab = Intent(context, Tabbed_purchase_list::class.java)
+            intentTab.putExtra("tab_index", 0)
+            startActivity(intentTab)
+        }
+
+        // 待出貨
+        b.sectionPurchaseList.imgPendingShipment.setOnClickListener {
+            val intentTab = Intent(context, Tabbed_purchase_list::class.java)
+            intentTab.putExtra("tab_index", 1)
+            startActivity(intentTab)
+        }
+
+        // 待收貨
+        b.sectionPurchaseList.imgReceiving.setOnClickListener {
+            val intentTab = Intent(context, Tabbed_purchase_list::class.java)
+            intentTab.putExtra("tab_index", 2)
+            startActivity(intentTab)
+        }
+
+        // 評價
+        b.sectionPurchaseList.imgShoppingCompleted.setOnClickListener {
+            val intentTab = Intent(context, Tabbed_purchase_list::class.java)
+            intentTab.putExtra("tab_index", 3)
+            startActivity(intentTab)
+        }
+
+        // 購買清單_查看全部
+        b.sectionPurchaseList.tvseeall1.setOnClickListener {
             val intent = Intent(requireContext(), Tabbed_purchase_list::class.java)
             startActivity(intent)
         }
-        //更多服務_查看全部
-        val tvseeall2_textview : TextView? = binding?.sectionMoreServices?.tvseeall2
-        tvseeall2_textview?.setOnClickListener {
+
+        // 更多服務_查看全部
+        b.sectionMoreServices.tvseeall2.setOnClickListener {
             val intent = Intent(requireContext(), Activity_more_serve::class.java)
             startActivity(intent)
         }
     }
 
-
-
-
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
 }

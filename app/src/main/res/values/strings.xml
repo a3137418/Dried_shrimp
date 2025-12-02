@@ -35,4 +35,14 @@
     <string name="shopping_completed">已完成</string>
     <string name="password">密碼</string>
     <string name="Password_Confirmation">密碼確認</string>
+    <string name="account_setting">帳號設定</string>
+    <string name="setting">設定</string>
+    <string name="Language">Language/語言</string>
+    <string name="chinese">繁體中文</string>
+    <string name="myhelper">我的小幫手</string>
+    <string name="help_center">幫助中心</string>
+    <string name="specification">皮蝦規範</string>
+    <string name="Usage_Rules">皮蝦購物使用規則</string>
+    <string name="like_shrimp">喜歡皮蝦?快去評價</string>
+    <string name="about">關於</string>
 </resources>
