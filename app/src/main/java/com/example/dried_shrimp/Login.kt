@@ -44,9 +44,15 @@ class Login : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        // Firebase Auth
         auth = FirebaseAuth.getInstance()
         // 讓底部認證區往上推
         // 上方 header 避免與狀態列重疊
+        // Google 登入設定
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id)) // google-services.json 自動產生
+            .requestEmail()
+            .build()
         ViewCompat.setOnApplyWindowInsetsListener(binding.loginHeader) { view, insets ->
             val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
             view.setPadding(view.paddingLeft, statusBarHeight, view.paddingRight, view.paddingBottom)
@@ -66,32 +72,7 @@ class Login : AppCompatActivity() {
         back()
 
     }
-    private fun loginUser(account: String, password: String) {
-        FirebaseAuth.getInstance()
-            .signInWithEmailAndPassword(account, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Toast.makeText(this, "登入成功", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    finish() // 不讓使用者按返回回到登入頁
-                } else {
-                    Toast.makeText(this, "登入失敗：${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-    private fun loadUserData() {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        FirebaseDatabase.getInstance().reference
-            .child("users").child(uid)
-            .get()
-            .addOnSuccessListener { snap ->
-                val phone = snap.child("phone").value
-                val account = snap.child("account").value
-
-            }
-    }
 
     private fun loginUser() {
         val email = binding.loginEtaccount.text.toString().trim()
@@ -101,7 +82,6 @@ class Login : AppCompatActivity() {
             Toast.makeText(this, "請輸入帳號與密碼", Toast.LENGTH_SHORT).show()
             return
         }
-
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -111,7 +91,6 @@ class Login : AppCompatActivity() {
 
                     // 這裡可以跳到首頁或關閉登入頁
                     goToUser2()
-                     finish()
                 } else {
                     // ❌ 驗證失敗
                     val msg = task.exception?.message ?: "未知錯誤"
@@ -127,13 +106,6 @@ class Login : AppCompatActivity() {
         startActivity(intent)
         finish()  // 通常關掉 Login 頁
     }
-
-
-
-
-
-
-
 
     fun initialization(){
         //google初始化
@@ -204,16 +176,21 @@ class Login : AppCompatActivity() {
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
 
-        FirebaseAuth.getInstance().signInWithCredential(credential)
+        auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val user = FirebaseAuth.getInstance().currentUser
-                    saveUserToDatabase(user)
+                    val user = auth.currentUser
+                    // 這裡 user 就是 Firebase 記住的使用者
+                    Toast.makeText(this, "登入成功：${user?.email}", Toast.LENGTH_SHORT).show()
+
+                    // 例如：回到主畫面或關閉 Login
+                    goToUser2()
                 } else {
-                    Toast.makeText(this, "登入驗證失敗", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "登入驗證失敗：${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
+
 
     fun Registration_page(){
         val tv_register = binding.tvRegister

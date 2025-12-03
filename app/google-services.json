@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "235904581358",
+    "firebase_url": "https://driedshrimp-1d56d-default-rtdb.firebaseio.com",
     "project_id": "driedshrimp-1d56d",
     "storage_bucket": "driedshrimp-1d56d.firebasestorage.app"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "235904581358-sn2hpi777c70c7na07mrk67d2331i9lf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dried_shrimp",
+            "certificate_hash": "93d459d6a46668c53846f991c71c79e9b63b4bfe"
+          }
+        },
         {
           "client_id": "235904581358-jcht81r44v6g8b50619oe9gl20f1nipl.apps.googleusercontent.com",
           "client_type": 3
