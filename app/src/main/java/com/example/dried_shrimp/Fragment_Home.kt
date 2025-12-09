@@ -1,5 +1,6 @@
 package com.example.dried_shrimp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -48,8 +49,12 @@ class Fragment_Home: Fragment() {
         etserach.setCompoundDrawables(searchIcon, null, cameraIcon, null)
 
 
-
+        img_cart.setOnClickListener {
+            val intent = Intent(context, shopping_cart::class.java)
+            startActivity(intent)
+        }
     }
+
 
 
 }

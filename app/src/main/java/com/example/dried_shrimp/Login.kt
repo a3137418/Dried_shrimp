@@ -9,6 +9,7 @@ import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -30,6 +31,11 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 import java.net.URLEncoder
 import com.google.firebase.database.ServerValue
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginResult
+
+
 
 class Login : AppCompatActivity() {
     lateinit var binding : ActivityLoginBinding
@@ -46,13 +52,7 @@ class Login : AppCompatActivity() {
         setContentView(binding.root)
         // Firebase Auth
         auth = FirebaseAuth.getInstance()
-        // 讓底部認證區往上推
         // 上方 header 避免與狀態列重疊
-        // Google 登入設定
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id)) // google-services.json 自動產生
-            .requestEmail()
-            .build()
         ViewCompat.setOnApplyWindowInsetsListener(binding.loginHeader) { view, insets ->
             val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
             view.setPadding(view.paddingLeft, statusBarHeight, view.paddingRight, view.paddingBottom)
@@ -67,7 +67,6 @@ class Login : AppCompatActivity() {
         }
         Registration_page()
         initialization()
-
         setlisteners()
         back()
 
@@ -133,6 +132,24 @@ class Login : AppCompatActivity() {
             startActivityForResult(signInIntent, GOOGLE_SIGN_IN)
         }
         //fb登入
+        LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+            override fun onSuccess(result: LoginResult) {
+                Log.d("FB_LOGIN", "Facebook 登入成功，取得 Token")
+                // 拿到 AccessToken 後，去換取 Firebase 憑證
+                handleFacebookAccessToken(result.accessToken)
+            }
+
+            override fun onCancel() {
+                Log.d("FB_LOGIN", "Facebook 登入取消")
+                Toast.makeText(this@Login, "取消 FB 登入", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onError(error: FacebookException) {
+                Log.e("FB_LOGIN", "Facebook 登入錯誤", error)
+                Toast.makeText(this@Login, "FB 登入錯誤: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+        // 點擊按鈕觸發登入流程
         binding.btfblogin.setOnClickListener {
             LoginManager.getInstance().logInWithReadPermissions(
                 this,
@@ -157,18 +174,24 @@ class Login : AppCompatActivity() {
                 Toast.makeText(this, "Google 登入失敗", Toast.LENGTH_SHORT).show()
             }
         }
-        // Facebook Login
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
     //fb登入
     private fun handleFacebookAccessToken(token: AccessToken) {
+        Log.d("FB_LOGIN", "開始進行 Firebase 憑證交換...") // 加入 Log 方便除錯
         val credential = FacebookAuthProvider.getCredential(token.token)
 
-        FirebaseAuth.getInstance().signInWithCredential(credential)
+        auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    saveUserToDatabase(FirebaseAuth.getInstance().currentUser)
+                    Log.d("FB_LOGIN", "Firebase 驗證成功")
+                    // 登入成功，儲存資料並跳轉 (在 saveUserToDatabase 裡面做)
+                    saveUserToDatabase(auth.currentUser)
+                } else {
+                    // ✅ 修正點：補上驗證失敗的處理
+                    Log.e("FB_LOGIN", "Firebase 驗證失敗", task.exception)
+                    Toast.makeText(this, "FB 登入失敗: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
             }
     }
@@ -190,8 +213,24 @@ class Login : AppCompatActivity() {
                 }
             }
     }
-
-
+    //顯示FB_KEY_HASH
+//    private fun printFacebookKeyHash() {
+//        try {
+//            val info = packageManager.getPackageInfo(
+//                packageName,
+//                PackageManager.GET_SIGNING_CERTIFICATES
+//            )
+//            val signatures = info.signingInfo!!.apkContentsSigners
+//            for (signature in signatures) {
+//                val md = MessageDigest.getInstance("SHA")
+//                md.update(signature.toByteArray())
+//                val keyHash = Base64.encodeToString(md.digest(), Base64.NO_WRAP)
+//                Log.d("FB_KEY_HASH", "key hash = $keyHash")
+//            }
+//        } catch (e: Exception) {
+//            Log.e("FB_KEY_HASH", "error: ${e.message}")
+//        }
+//    }
     fun Registration_page(){
         val tv_register = binding.tvRegister
 
@@ -257,11 +296,7 @@ class Login : AppCompatActivity() {
         val name = user.displayName ?: "皮蝦用戶"
         val email = user.email ?: ""
         val photoUrl = user.photoUrl?.toString() ?: ""
-
-        // 取第一個登入方式當作 provider
-        val provider = user.providerData
-            .firstOrNull { it.providerId != "firebase" }
-            ?.providerId ?: "unknown"
+        val provider = user.providerData.firstOrNull { it.providerId != "firebase" }?.providerId ?: "unknown"
 
         val userData = mapOf(
             "uid" to uid,
@@ -275,11 +310,14 @@ class Login : AppCompatActivity() {
         val dbRef = FirebaseDatabase.getInstance().getReference("users").child(uid)
         dbRef.updateChildren(userData)
             .addOnSuccessListener {
-                // 這裡可以跳頁、更新 UI
+                // ✅ 修正點：原本這裡只有 Toast，現在加上跳轉頁面
                 Toast.makeText(this, "登入成功，資料已更新", Toast.LENGTH_SHORT).show()
+                goToUser2()
             }
             .addOnFailureListener {
-                Toast.makeText(this, "使用者資料儲存失敗：${it.message}", Toast.LENGTH_SHORT).show()
+                // 如果資料庫寫入失敗，通常還是算登入成功，也可以選擇在這裡跳轉，或是提示錯誤
+                Toast.makeText(this, "使用者資料儲存失敗，但仍允許進入", Toast.LENGTH_SHORT).show()
+                goToUser2()
             }
     }
 

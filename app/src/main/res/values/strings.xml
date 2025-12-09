@@ -45,4 +45,6 @@
     <string name="Usage_Rules">皮蝦購物使用規則</string>
     <string name="like_shrimp">喜歡皮蝦?快去評價</string>
     <string name="about">關於</string>
+    <string name="fb_login_protocol_scheme">fb你的AppID</string>
+    <string name="shopping_cart">購物車</string>
 </resources>
