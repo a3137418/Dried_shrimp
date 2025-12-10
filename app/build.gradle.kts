@@ -51,7 +51,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation(libs.firebase.database)
-
+    // 2. 【關鍵！】加入 Firestore 資料庫功能
+    implementation("com.google.firebase:firebase-firestore")
+    // 3. 如果您還沒加 Authentication (使用者登入)，也建議加上
+    implementation("com.google.firebase:firebase-auth")
     // Facebook SDK
     implementation("com.facebook.android:facebook-login:latest.release")
 
