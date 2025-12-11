@@ -14,13 +14,14 @@ import com.example.dried_shrimp.ui.adapters.GuessLikeAdapter
 import com.example.dried_shrimp.ui.activities.AccountSettingActivity
 import com.example.dried_shrimp.ui.activities.Login
 import com.example.dried_shrimp.ui.activities.MoreServeActivity
+import com.example.dried_shrimp.ui.activities.MyStoreActivity
 import com.example.dried_shrimp.ui.activities.RegisterActivity
+import com.example.dried_shrimp.ui.activities.ShoppingCartActivity
 import com.example.dried_shrimp.ui.activities.TabbedPurchaseListActivity
 import com.example.dried_shrimp.ui.adapters.UserServiceAdapter
 import com.google.firebase.auth.FirebaseAuth
 
 class Fragment_user2 : Fragment() {
-
     private var binding: FragmentUser2Binding? = null
 
     override fun onCreateView(
@@ -34,6 +35,9 @@ class Fragment_user2 : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        var img_cart = binding?.userImgCart
+
+
 
         setupRecyclerViews()
         setListeners()
@@ -132,7 +136,6 @@ class Fragment_user2 : Fragment() {
             intentTab.putExtra("tab_index", 1)
             startActivity(intentTab)
         }
-
         // 待收貨
         b.sectionPurchaseList.imgReceiving.setOnClickListener {
             val intentTab = Intent(context, TabbedPurchaseListActivity::class.java)
@@ -156,6 +159,15 @@ class Fragment_user2 : Fragment() {
         // 更多服務_查看全部
         b.sectionMoreServices.tvseeall2.setOnClickListener {
             val intent = Intent(requireContext(), MoreServeActivity::class.java)
+            startActivity(intent)
+        }
+
+        b.userImgCart.setOnClickListener {
+            val intent = Intent(context, ShoppingCartActivity::class.java)
+            startActivity(intent)
+        }
+        b.MyStore.setOnClickListener {
+            val intent = Intent(context, MyStoreActivity::class.java)
             startActivity(intent)
         }
     }

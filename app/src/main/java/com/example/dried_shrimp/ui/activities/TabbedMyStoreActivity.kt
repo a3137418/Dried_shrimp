@@ -2,31 +2,34 @@ package com.example.dried_shrimp.ui.activities
 
 import android.os.Bundle
 import android.widget.ImageView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-
 import androidx.viewpager2.widget.ViewPager2
-import com.example.dried_shrimp.ui.adapters.PurchasePagerAdapter
 import com.example.dried_shrimp.R
-import com.example.dried_shrimp.databinding.ActivityShoppingCartBinding
+import com.example.dried_shrimp.databinding.ActivityTabbedMyProductsBinding
 import com.example.dried_shrimp.databinding.ActivityTabbedPurchaseListBinding
+import com.example.dried_shrimp.ui.adapters.MyproductsPagerAdapter
+import com.example.dried_shrimp.ui.adapters.PurchasePagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-class TabbedPurchaseListActivity : AppCompatActivity() {
-    lateinit var binding : ActivityTabbedPurchaseListBinding
+class TabbedMyStoreActivity : AppCompatActivity() {
+
+
+
+    lateinit var binding : ActivityTabbedMyProductsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // 取得 WindowController
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
-
         // 設定為 true：代表狀態列背景是淺色，所以系統會把文字/圖示改成「黑色」
         // 設定為 false：代表狀態列背景是深色，系統會把文字/圖示改成「白色」
         windowInsetsController.isAppearanceLightStatusBars = true
         // 1. 初始化 Binding
-        binding = ActivityTabbedPurchaseListBinding.inflate(layoutInflater)
+        binding = ActivityTabbedMyProductsBinding.inflate(layoutInflater)
         // 2. 使用 binding.root 來設定畫面，而不是 R.layout.xxx
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -34,23 +37,22 @@ class TabbedPurchaseListActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
-        val viewPager = findViewById<ViewPager2>(R.id.purchase_list_viewPager)
+        val tabLayout = binding.tabLayoutMyProducts
+        val viewPager = binding.MyProductsViewPager
+        val btn_add = binding.btnAddproducts
 
-        val adapter = PurchasePagerAdapter(this)
+        val adapter = MyproductsPagerAdapter(this)
         viewPager.adapter = adapter
-
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             val index = intent.getIntExtra("tab_index", 0)
             viewPager.currentItem = index
             tab.text = when (position) {
-                0 -> "待付款"
-                1 -> "待出貨"
-                2 -> "待收貨"
-                3 -> "已完成"
-                4 -> "退貨/退款"
-                5 -> "不成立"
+                0 -> "架上商品"
+                1 -> "已售完"
+                2 -> "審核中"
+                3 -> "已違規"
+                4 -> "未上架"
                 else -> ""
             }
         }.attach()
@@ -58,7 +60,7 @@ class TabbedPurchaseListActivity : AppCompatActivity() {
         back()
     }
     fun back(){
-        val back = findViewById<ImageView>(R.id.purchase_img_back)
+        val back = binding.imgBackMyProducts
         back.setOnClickListener {
             finish()
         }

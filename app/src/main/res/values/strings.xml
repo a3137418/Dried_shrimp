@@ -47,4 +47,11 @@
     <string name="about">關於</string>
     <string name="fb_login_protocol_scheme">fb你的AppID</string>
     <string name="shopping_cart">購物車</string>
+    <string name="My_store">我的賣場</string>
+    <string name="My_sales">我的銷售</string>
+    <string name="mystore_visitsales">查看銷售紀錄 ></string>
+    <string name="Not_valid">不成立</string>
+    <string name="Returns_and_Refunds">退貨/退款</string>
+
+
 </resources>

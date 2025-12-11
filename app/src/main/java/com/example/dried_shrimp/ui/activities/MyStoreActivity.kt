@@ -1,41 +1,49 @@
 package com.example.dried_shrimp.ui.activities
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dried_shrimp.R
 import com.example.dried_shrimp.databinding.ActivityMoreServeBinding
-import com.example.dried_shrimp.databinding.ActivityTabbedPurchaseListBinding
-import com.example.dried_shrimp.ui.adapters.MoreServiceAdapter
+import com.example.dried_shrimp.databinding.ActivityMyStoreBinding
 
-class MoreServeActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMoreServeBinding
+
+class MyStoreActivity : AppCompatActivity() {
+    lateinit var binding : ActivityMyStoreBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // 1. 初始化 Binding
-        binding = ActivityMoreServeBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        binding = ActivityMyStoreBinding.inflate(layoutInflater)
 
+        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        setupRecyclerViews()
+
+
+        setListeners()
         back()
     }
 
-    private fun setupRecyclerViews() {
-        val more_serive_Adapter = MoreServiceAdapter()
-        binding?.moreseriveRecycle?.layoutManager = GridLayoutManager(this, 2)
-        binding?.moreseriveRecycle?.adapter = more_serive_Adapter
+    private fun setListeners() {
+        val b = binding ?: return
+        b.viewMysotreFunction.MyProducts.setOnClickListener {
+            val intentTab = Intent(this, TabbedMyStoreActivity::class.java)
+            intentTab.putExtra("tab_index", 0)
+            startActivity(intentTab)
+        }
+
     }
+
     fun back(){
-        val back = binding.moerseriveImgBack
+        val back = binding.MyStoreBack
         back.setOnClickListener {
             finish()
         }

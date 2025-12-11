@@ -30,6 +30,7 @@ class ShoppingCartActivity : AppCompatActivity() {
             insets
         }
         setupRecyclerViews()
+        back()
     }
 
 
