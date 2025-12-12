@@ -2,33 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="1dp"
-    android:background="@color/white"
+    android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/tv_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:text="商品描述"
-        android:textColor="@color/black" />
-
-    <TextView
-        android:id="@+id/textView62"
-        android:layout_width="wrap_content"
+        android:id="@+id/tv_category_name"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textColor="#D0021B"
-        android:text="*" />
+        android:text="女生衣著"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/tv_value"
+        android:id="@+id/tv_category_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:text="0/3000 >"
-        android:textColor="#757575" />
+        android:text=""
+        android:textColor="#9E9E9E"
+        android:textSize="12sp" />
 </LinearLayout>

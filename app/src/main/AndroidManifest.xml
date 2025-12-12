@@ -14,7 +14,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Dried_shrimp">
         <activity
-            android:name=".ui.activities.TabbedMyStoreActivity"
+            android:name=".ui.activities.CategorySelectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.AddProductsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.TabbedMyProductsActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activities.MyStoreActivity"

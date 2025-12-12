@@ -12,14 +12,20 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginEnd="12dp"
-        android:src="@drawable/ticket" /> <TextView
-    android:id="@+id/tv_label"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:text="價格 *"
-    android:textColor="@color/black" />
-
+        android:src="@drawable/ticket" />
+    <TextView
+        android:id="@+id/tv_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="價格"
+        android:textColor="@color/black" />
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="4dp"
+        android:text="*"
+        android:textColor="#D0021B" />
     <EditText
         android:id="@+id/et_input"
         android:layout_width="wrap_content"

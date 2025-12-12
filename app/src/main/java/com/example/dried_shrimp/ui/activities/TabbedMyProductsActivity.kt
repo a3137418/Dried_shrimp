@@ -1,22 +1,17 @@
 package com.example.dried_shrimp.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.viewpager2.widget.ViewPager2
 import com.example.dried_shrimp.R
 import com.example.dried_shrimp.databinding.ActivityTabbedMyProductsBinding
-import com.example.dried_shrimp.databinding.ActivityTabbedPurchaseListBinding
 import com.example.dried_shrimp.ui.adapters.MyproductsPagerAdapter
-import com.example.dried_shrimp.ui.adapters.PurchasePagerAdapter
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-class TabbedMyStoreActivity : AppCompatActivity() {
+class TabbedMyProductsActivity : AppCompatActivity() {
 
 
 
@@ -39,8 +34,6 @@ class TabbedMyStoreActivity : AppCompatActivity() {
         }
         val tabLayout = binding.tabLayoutMyProducts
         val viewPager = binding.MyProductsViewPager
-        val btn_add = binding.btnAddproducts
-
         val adapter = MyproductsPagerAdapter(this)
         viewPager.adapter = adapter
 
@@ -56,8 +49,16 @@ class TabbedMyStoreActivity : AppCompatActivity() {
                 else -> ""
             }
         }.attach()
-
+        listener()
         back()
+    }
+
+    fun listener(){
+        val btn_add = binding.btnAddproducts
+        btn_add.setOnClickListener {
+            val intent = Intent(this, AddProductsActivity::class.java)
+            startActivity(intent)
+        }
     }
     fun back(){
         val back = binding.imgBackMyProducts

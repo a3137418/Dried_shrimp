@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
 import com.example.dried_shrimp.databinding.FragmentUser2Binding
 import com.example.dried_shrimp.ui.adapters.GuessLikeAdapter
 import com.example.dried_shrimp.ui.activities.AccountSettingActivity
@@ -62,25 +64,39 @@ class Fragment_user2 : Fragment() {
         val loginRoot = b.viewUserLogin.root
 
         if (user == null) {
-            // 未登入：顯示 guest，隱藏 login
+            // === 未登入狀態 ===
             guestRoot.visibility = View.VISIBLE
             loginRoot.visibility = View.GONE
+
+            // --- 新增這行：把「我的賣場」隱藏起來 ---
+            b.MyStore.visibility = View.GONE
+
         } else {
-            // 已登入：顯示 login，隱藏 guest
+            // === 已登入狀態 ===
             guestRoot.visibility = View.GONE
             loginRoot.visibility = View.VISIBLE
 
-            // 已登入 layout 裡的元件
+            // --- 新增這行：把「我的賣場」顯示出來 ---
+            b.MyStore.visibility = View.VISIBLE
+
+            // 已登入 layout 裡的元件設定...
             val tvUserName: TextView = b.viewUserLogin.tvUserName
             val tvUserEmail: TextView = b.viewUserLogin.tvUserEmail
+            val imgMyaccountLogin: ImageView = b.viewUserLogin.imgMyaccountLogin
             val btnLogout: Button = b.viewUserLogin.btnLogout
 
             tvUserName.text = user.displayName ?: "皮蝦用戶"
             tvUserEmail.text = user.email ?: ""
-
+            // (B) 設定大頭貼 (如果有 Imageview 叫 imgStoreAvatar)
+            if (user.photoUrl != null) {
+                Glide.with(this)
+                    .load(user.photoUrl)
+                    .circleCrop() // 圓形剪裁
+                    .into(imgMyaccountLogin)
+            }
             btnLogout.setOnClickListener {
                 FirebaseAuth.getInstance().signOut()
-                updateUserUi()
+                updateUserUi() // 登出後重新整理 UI，賣場按鈕會自動消失
             }
         }
     }
