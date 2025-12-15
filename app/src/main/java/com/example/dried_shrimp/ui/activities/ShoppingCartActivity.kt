@@ -40,7 +40,7 @@ class ShoppingCartActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerViews() {
-        val guesslike_Adapter = GuessLikeAdapter()
+        val guesslike_Adapter = GuessLikeAdapter(emptyList())
         binding?.sectionGuesslike?.myRecycleLike?.layoutManager = GridLayoutManager(this, 2)
         binding?.sectionGuesslike?.myRecycleLike?.adapter = guesslike_Adapter
 

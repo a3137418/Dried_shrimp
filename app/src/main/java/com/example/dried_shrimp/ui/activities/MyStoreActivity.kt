@@ -11,10 +11,13 @@ import com.bumptech.glide.Glide
 import com.example.dried_shrimp.R
 import com.example.dried_shrimp.databinding.ActivityMyStoreBinding
 import com.google.firebase.auth.FirebaseAuth
-
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MyStoreActivity : AppCompatActivity() {
     lateinit var binding : ActivityMyStoreBinding
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,13 +33,16 @@ class MyStoreActivity : AppCompatActivity() {
         setListeners()
         back()
     }
+
     private fun updateStoreInfo(){
         val user = FirebaseAuth.getInstance().currentUser
         if(user != null){
             // (A) 設定店名 / 使用者名稱
             // 假設您的 Layout 裡有一個 TextView 叫 tvStoreName
             val userName = user.displayName ?: "未命名賣場"
+            val userEmail = user.email
             binding.viewUserMystore.tvUserName.text = "${userName} 的賣場"
+            binding.viewUserMystore.tvUserEmail.text = userEmail
 
             // (B) 設定大頭貼 (如果有 Imageview 叫 imgStoreAvatar)
             if (user.photoUrl != null) {
@@ -51,6 +57,11 @@ class MyStoreActivity : AppCompatActivity() {
             finish()
         }
     }
+    // 每次回到頁面時，重新抓取資料 (這樣新增完回來才看得到)
+    override fun onResume() {
+        super.onResume()
+    }
+
 
     private fun setListeners() {
         val b = binding ?: return
@@ -59,7 +70,11 @@ class MyStoreActivity : AppCompatActivity() {
             intentTab.putExtra("tab_index", 0)
             startActivity(intentTab)
         }
-
+        b.viewUserMystore.btVisitMystore.setOnClickListener {
+            val intentTab = Intent(this, TabbedMyProductsActivity::class.java)
+            intentTab.putExtra("tab_index", 0)
+            startActivity(intentTab)
+        }
     }
 
     fun back(){

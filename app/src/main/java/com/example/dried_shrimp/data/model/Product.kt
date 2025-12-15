@@ -1,5 +1,5 @@
 package com.example.dried_shrimp.data.model
-
+import java.io.Serializable
 data class Product(
     var id: String = "",              // Firebase 文件 ID
     val sellerId: String = "",        // 賣家 ID
@@ -12,5 +12,7 @@ data class Product(
     val imageUrl: String = "",        // 商品圖片網址
     val gtin: String = "",            // GTIN (選填)
     val shippingFee: Int = 60,        // 運費 (範例預設值)
+    val descImageUrl: String = "",
+    val status: String = "ON_SHELF",
     val timestamp: Long = System.currentTimeMillis() // 上架時間
-)
+): Serializable

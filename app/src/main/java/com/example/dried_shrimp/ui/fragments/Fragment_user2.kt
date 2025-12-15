@@ -8,9 +8,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
+import com.example.dried_shrimp.data.model.Product
 import com.example.dried_shrimp.databinding.FragmentUser2Binding
 import com.example.dried_shrimp.ui.adapters.GuessLikeAdapter
 import com.example.dried_shrimp.ui.activities.AccountSettingActivity
@@ -20,12 +22,16 @@ import com.example.dried_shrimp.ui.activities.MyStoreActivity
 import com.example.dried_shrimp.ui.activities.RegisterActivity
 import com.example.dried_shrimp.ui.activities.ShoppingCartActivity
 import com.example.dried_shrimp.ui.activities.TabbedPurchaseListActivity
+import com.example.dried_shrimp.ui.adapters.HomeProductAdapter
 import com.example.dried_shrimp.ui.adapters.UserServiceAdapter
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 
 class Fragment_user2 : Fragment() {
     private var binding: FragmentUser2Binding? = null
-
+    private val db = FirebaseFirestore.getInstance()
+    private lateinit var customAdapter: GuessLikeAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -112,10 +118,15 @@ class Fragment_user2 : Fragment() {
             GridLayoutManager(requireContext(), 2)
         b.sectionMoreServices.myRecycleServe.adapter = myServiceAdapter
 
-        val customAdapter = GuessLikeAdapter()
-        b.sectionGuesslike.myRecycleLike.layoutManager =
-            GridLayoutManager(requireContext(), 2)
+
+
+        // 從 Firebase 載入真實商品
+        loadAllProducts()
+        customAdapter = GuessLikeAdapter(emptyList())
+        b.sectionGuesslike.myRecycleLike.layoutManager = GridLayoutManager(requireContext(), 2)
+        b.sectionGuesslike.myRecycleLike.isNestedScrollingEnabled = false
         b.sectionGuesslike.myRecycleLike.adapter = customAdapter
+        loadAllProducts()
     }
 
     /**
@@ -187,7 +198,26 @@ class Fragment_user2 : Fragment() {
             startActivity(intent)
         }
     }
-
+    private fun loadAllProducts() {
+        db.collection("products")
+            .whereEqualTo("status", "ON_SHELF") // ★ 加入這行，確保不推薦下架商品
+            .limit(10) // 通常猜你喜歡會限制數量
+            .get()
+            .addOnSuccessListener { result: QuerySnapshot ->
+                // 4. 明確指定 result: QuerySnapshot 解決推斷錯誤
+                if (!result.isEmpty) {
+                    // 5. 確保 Product 已 import，這樣 ::class.java 就不會報錯
+                    val productList = result.toObjects(Product::class.java)
+                    customAdapter.updateData(productList)
+                }
+            }
+            .addOnFailureListener { e: Exception ->
+                // 6. 明確指定 e: Exception
+                if (isAdded) {
+                    Toast.makeText(requireContext(), "載入失敗: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null

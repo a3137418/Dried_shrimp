@@ -35,6 +35,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import java.net.URLEncoder
 
 class Login : AppCompatActivity() {
@@ -291,7 +293,10 @@ class Login : AppCompatActivity() {
     }
 
     fun saveUserToDatabase(user: FirebaseUser?) {
-        if (user == null) return
+        if (user == null) {
+            goToUser2() // 如果 user 是 null 還是讓他嘗試跳轉，避免卡死
+            return
+        }
 
         val uid = user.uid
         val name = user.displayName ?: "皮蝦用戶"
@@ -299,25 +304,30 @@ class Login : AppCompatActivity() {
         val photoUrl = user.photoUrl?.toString() ?: ""
         val provider = user.providerData.firstOrNull { it.providerId != "firebase" }?.providerId ?: "unknown"
 
-        val userData = mapOf(
+        // 準備資料
+        val userData = hashMapOf(
             "uid" to uid,
             "displayName" to name,
             "email" to email,
             "photoUrl" to photoUrl,
             "provider" to provider,
-            "lastLoginAt" to ServerValue.TIMESTAMP
+            "lastLoginAt" to System.currentTimeMillis() // Firestore 建議直接存時間戳記
         )
 
-        val dbRef = FirebaseDatabase.getInstance().getReference("users").child(uid)
-        dbRef.updateChildren(userData)
+        // ⭐ 這裡改成使用 Firestore！
+        val db = FirebaseFirestore.getInstance()
+        // 使用 merge (合併) 模式，這樣才不會把之前的購物車資料蓋掉
+        db.collection("users").document(uid)
+            .set(userData, SetOptions.merge())
             .addOnSuccessListener {
-                // ✅ 修正點：原本這裡只有 Toast，現在加上跳轉頁面
-                Toast.makeText(this, "登入成功，資料已更新", Toast.LENGTH_SHORT).show()
+                // 成功寫入 -> 跳轉
+                Toast.makeText(this, "登入成功！", Toast.LENGTH_SHORT).show()
                 goToUser2()
             }
-            .addOnFailureListener {
-                // 如果資料庫寫入失敗，通常還是算登入成功，也可以選擇在這裡跳轉，或是提示錯誤
-                Toast.makeText(this, "使用者資料儲存失敗，但仍允許進入", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener { e ->
+                // 失敗 -> 印出錯誤但還是讓他跳轉 (不要卡住使用者)
+                Log.e("LOGIN", "資料庫寫入失敗", e)
+                Toast.makeText(this, "登入成功 (資料更新略過)", Toast.LENGTH_SHORT).show()
                 goToUser2()
             }
     }

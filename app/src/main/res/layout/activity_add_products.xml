@@ -85,12 +85,20 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_add_photo_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="+ 加入照片"
                         android:textColor="#D0021B"
                         android:textSize="12sp" />
-                </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/img_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        android:padding="2dp"/> </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -175,27 +183,31 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layoutShippingFee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@color/white"
-                android:padding="16dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="16dp">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/receiving"
-                    app:tint="#555555"/> <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="運費 (重量/包裹尺寸大小) *"
-                android:textColor="@color/black" />
+                    app:tint="#555555" />
 
                 <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="運費 (重量/包裹尺寸大小) *"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/tv_shipping_fee_display"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="NT$210 >"

@@ -34,7 +34,6 @@ class HomeActivity : AppCompatActivity() {
             insets
         }
         findview()
-        adapter()
 
         supportActionBar?.setDisplayShowTitleEnabled(false)
         val sizeInPx = TypedValue.applyDimension(
@@ -59,13 +58,5 @@ class HomeActivity : AppCompatActivity() {
         recycle_home =findViewById(R.id.recycle_home)
 
     }
-
-    fun adapter() {
-        val customAdapter = GuessLikeAdapter()
-        recycle_home.layoutManager = GridLayoutManager(this, 2)
-        recycle_home.adapter = customAdapter
-
-    }
-
 
 }
