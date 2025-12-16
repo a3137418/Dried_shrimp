@@ -1,5 +1,6 @@
 package com.example.dried_shrimp.ui.fragments.myproducts
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,10 +9,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dried_shrimp.data.model.Product
-// 請確認您的 XML 檔名是否對應此 Binding 類別
 import com.example.dried_shrimp.databinding.FragmentMyproductsOntheshelfBinding
-// 這裡假設您有一個專門顯示「我的商品」的 Adapter，如果還沒做，可以先暫時用 GuessLikeAdapter
-import com.example.dried_shrimp.ui.adapters.GuessLikeAdapter
+import com.example.dried_shrimp.ui.activities.AddProductsActivity
 import com.example.dried_shrimp.ui.adapters.MyProductAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -42,7 +41,10 @@ class Fragment_myproducts_ontheshelf : Fragment() {
         setupRecyclerView()
 
     }
-
+    override fun onResume() {
+        super.onResume()
+        loadProducts()
+    }
     private fun setupRecyclerView() {
         // 這裡填入 Adapter 需要的參數
         adapter = MyProductAdapter(
@@ -50,11 +52,9 @@ class Fragment_myproducts_ontheshelf : Fragment() {
 
             // 2. 當使用者點擊「編輯」時
             onEditClick = { product ->
-                Toast.makeText(context, "準備編輯: ${product.name}", Toast.LENGTH_SHORT).show()
-                // TODO: 之後在這裡寫跳轉到 EditProductActivity 的程式碼
-                // val intent = Intent(context, EditProductActivity::class.java)
-                // intent.putExtra("PRODUCT_DATA", product)
-                // startActivity(intent)
+                val intent = Intent(context, AddProductsActivity::class.java)
+                intent.putExtra("EDIT_PRODUCT", product)
+                startActivity(intent)
             },
 
             // 3. 當使用者點擊「下架」時

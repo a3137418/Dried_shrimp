@@ -7,15 +7,21 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.dried_shrimp.data.model.Order
 import com.example.dried_shrimp.data.model.Product
 import com.example.dried_shrimp.databinding.FragmentPurchaselistPendingShipmentBinding
 import com.example.dried_shrimp.ui.adapters.GuessLikeAdapter
+import com.example.dried_shrimp.ui.adapters.OrderAdapter
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 
 class Fragment_Purchase_list_PendingShipment: Fragment() {
     private var binding: FragmentPurchaselistPendingShipmentBinding ?=null
     private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private lateinit var adapter: OrderAdapter
     private lateinit var guesslike_Adapter: GuessLikeAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,14 +35,44 @@ class Fragment_Purchase_list_PendingShipment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerViews()
+        loadOrders()
     }
-
+    override fun onResume() {
+        super.onResume()
+        loadOrders() // 每次回來 (例如付完款回來) 都要重新整理
+    }
     private fun setupRecyclerViews() {
         guesslike_Adapter = GuessLikeAdapter(emptyList())
         binding?.sectionGuesslike?.myRecycleLike?.layoutManager = GridLayoutManager(requireContext(),2)
         binding?.sectionGuesslike?.myRecycleLike?.adapter = guesslike_Adapter
         loadAllProducts()
+        // 2. 訂單列表設定 (★ 補上這裡)
+        val currentUserId = auth.currentUser?.uid ?: ""
+
+        adapter = OrderAdapter(emptyList(), currentUserId) { order ->
+            // 待出貨狀態，買家點擊通常只是查看詳情，或是無法點擊
+            // 這裡可以留空，或者跳轉到訂單詳情頁
+            Toast.makeText(context, "等待賣家出貨中", Toast.LENGTH_SHORT).show()
+        }
+        binding?.recyclePurchaselistPendingShipment?.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = this@Fragment_Purchase_list_PendingShipment.adapter
+        }
     }
+    private fun loadOrders() {
+        val userId = auth.currentUser?.uid ?: return
+
+        // ★ 修改：從 users -> {uid} -> orders 讀取
+        // 不需要再寫 .whereEqualTo("buyerId", userId) 了，因為已經在你的資料夾下了
+        db.collection("users").document(userId).collection("orders")
+            .whereEqualTo("status", "TO_SHIP") // 只要篩選狀態
+            .get()
+            .addOnSuccessListener { result ->
+                val list = result.toObjects(Order::class.java)
+                adapter.updateData(list.sortedByDescending { it.timestamp })
+            }
+    }
+
     private fun loadAllProducts() {
         db.collection("products")
             .whereEqualTo("status", "ON_SHELF") // ★ 加入這行，確保不推薦下架商品

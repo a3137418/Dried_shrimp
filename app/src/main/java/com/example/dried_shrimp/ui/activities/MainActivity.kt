@@ -10,6 +10,8 @@ import com.example.dried_shrimp.ui.fragments.Fragment_Home
 import com.example.dried_shrimp.ui.fragments.Fragment_Live
 import com.example.dried_shrimp.ui.fragments.Fragment_user2
 import com.example.dried_shrimp.R
+import com.example.dried_shrimp.ui.fragments.Fragment_Category
+import com.example.dried_shrimp.ui.fragments.Fragment_notify
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 
@@ -44,9 +46,12 @@ class MainActivity : AppCompatActivity() {
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> loadFragment(Fragment_Home(), R.id.fragment_container)
-                R.id.nav_category -> loadFragment(Fragment_Home(), R.id.fragment_container)
+                R.id.nav_category -> loadFragment(Fragment_Category(), R.id.fragment_container)
                 R.id.nav_live ->{
                     loadFragment(Fragment_Live(), R.id.fragment_container)
+                }
+                R.id.nav_chat ->{
+                    loadFragment(Fragment_notify(), R.id.fragment_container)
                 }
                 R.id.nav_user -> loadFragment(Fragment_user2(), R.id.fragment_container)
             }

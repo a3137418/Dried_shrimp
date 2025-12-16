@@ -14,6 +14,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Dried_shrimp">
         <activity
+            android:name=".ui.activities.SellerOrderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.PaymentActivity"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".ui.activities.CheckoutActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activities.ProductDetailActivity"
             android:exported="false" />
         <activity

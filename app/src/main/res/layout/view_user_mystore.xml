@@ -40,10 +40,10 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/btVisitMystore"
+        android:id="@+id/btn_seller_orders"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/orangle"
         android:background="@drawable/bg_visitmystore"
-        android:text="查看賣場" />
+        android:text="賣家訂單中心" />
 </LinearLayout>

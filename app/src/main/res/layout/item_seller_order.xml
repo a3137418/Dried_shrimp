@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:elevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tv_seller_order_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="訂單編號: 2023001"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_buyer_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="買家: 小明"
+            android:textColor="#555555" />
+
+        <TextView
+            android:id="@+id/tv_order_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="商品: 蝦米 x 5..."
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_order_total"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="總收入: $600"
+                android:textSize="16sp"
+                android:textColor="#E91E63"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_seller_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="安排出貨" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

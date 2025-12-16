@@ -50,6 +50,8 @@ dependencies {
     // Firebase BOM
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation ("com.google.firebase:firebase-firestore-ktx")
+    implementation ("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-storage")
     implementation(libs.firebase.database)
     // 2. 【關鍵！】加入 Firestore 資料庫功能
@@ -101,5 +103,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    //畫面下拉更新
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
 }
 

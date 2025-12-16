@@ -7,15 +7,21 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dried_shrimp.data.model.Product
 import com.example.dried_shrimp.databinding.FragmentPurchaselistReturnthegoodsBinding
 import com.example.dried_shrimp.ui.adapters.GuessLikeAdapter
+import com.example.dried_shrimp.ui.adapters.OrderAdapter
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.example.dried_shrimp.data.model.Order
 
 class Fragment_Purchase_list_Returnthegoods: Fragment() {
     private var binding: FragmentPurchaselistReturnthegoodsBinding ?=null
     private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance() // ★ 補上 auth
+    private lateinit var adapter: OrderAdapter    // ★ 補上 adapter
     private lateinit var guesslike_Adapter: GuessLikeAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,13 +35,41 @@ class Fragment_Purchase_list_Returnthegoods: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerViews()
+        loadOrders()
     }
-
+    override fun onResume() {
+        super.onResume()
+        loadOrders() // ★ 補上載入資料
+    }
     private fun setupRecyclerViews() {
         guesslike_Adapter = GuessLikeAdapter(emptyList())
         binding?.sectionGuesslike?.myRecycleLike?.layoutManager = GridLayoutManager(requireContext(),2)
         binding?.sectionGuesslike?.myRecycleLike?.adapter = guesslike_Adapter
         loadAllProducts()
+        // 2. 訂單列表 (★ 補上)
+        val currentUserId = auth.currentUser?.uid ?: ""
+        adapter = OrderAdapter(emptyList(), currentUserId) { order ->
+            // 點擊事件
+        }
+
+        binding?.recyclePurchaselistReturnthegoods?.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = this@Fragment_Purchase_list_Returnthegoods.adapter
+        }
+    }
+    // ★ 補上讀取訂單邏輯
+    private fun loadOrders() {
+        val userId = auth.currentUser?.uid ?: return
+
+        // ★ 修改：從 users -> {uid} -> orders 讀取
+        // 不需要再寫 .whereEqualTo("buyerId", userId) 了，因為已經在你的資料夾下了
+        db.collection("users").document(userId).collection("orders")
+            .whereEqualTo("status", "RETURNED") // 只要篩選狀態
+            .get()
+            .addOnSuccessListener { result ->
+                val list = result.toObjects(Order::class.java)
+                adapter.updateData(list.sortedByDescending { it.timestamp })
+            }
     }
     private fun loadAllProducts() {
         db.collection("products")

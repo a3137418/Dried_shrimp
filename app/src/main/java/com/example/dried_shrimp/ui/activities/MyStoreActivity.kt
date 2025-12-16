@@ -64,16 +64,21 @@ class MyStoreActivity : AppCompatActivity() {
 
 
     private fun setListeners() {
-        val b = binding ?: return
-        b.viewMysotreFunction.MyProducts.setOnClickListener {
+        binding.viewMysotreFunction.MyProducts.setOnClickListener {
             val intentTab = Intent(this, TabbedMyProductsActivity::class.java)
             intentTab.putExtra("tab_index", 0)
             startActivity(intentTab)
         }
-        b.viewUserMystore.btVisitMystore.setOnClickListener {
-            val intentTab = Intent(this, TabbedMyProductsActivity::class.java)
-            intentTab.putExtra("tab_index", 0)
-            startActivity(intentTab)
+
+        binding.viewMysotreFunction.MyProducts.setOnClickListener {
+            // 這是原本的商品管理
+            val intent = Intent(this, TabbedMyProductsActivity::class.java)
+            startActivity(intent)
+        }
+        // ★ 新增：前往賣家訂單中心
+        binding.viewUserMystore.btnSellerOrders.setOnClickListener {
+            val intent = Intent(this, SellerOrderActivity::class.java)
+            startActivity(intent)
         }
     }
 
