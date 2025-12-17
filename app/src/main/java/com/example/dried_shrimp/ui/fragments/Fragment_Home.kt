@@ -88,24 +88,64 @@ class Fragment_Home: Fragment() {
     }
 
     // ★★★ 新增：搜尋專用的函式 ★★★
-    private fun searchProducts(keyword: String) {
-        // 使用 Kotlin 的強大過濾功能
-        // filter: 篩選
-        // ignoreCase = true: 忽略大小寫 (搜尋 "a" 也可以找到 "A")
+    private fun searchProducts(input: String) : List<String> {
+        // --- 1. 製作「同義詞」擴充清單 ---
+        // 預設搜尋列表只包含使用者打的字
+        val keywords = mutableListOf(input) // 先把使用者打的字加進去
 
+        // 這裡設定你的「類別邏輯」
+        // 如果輸入包含 "衣服" 或 "服飾"，就加入相關分類
+        if (input.contains("衣服", ignoreCase = true) || input.contains("服飾", ignoreCase = true)) {
+            keywords.add("上衣")
+            keywords.add("T-shirt")
+            keywords.add("褲")
+            keywords.add("裙")
+            keywords.add("洋裝")
+            keywords.add("外套")
+        }
+
+        // 如果輸入包含 "電腦" 或 "3C"，就加入相關分類
+        if (input.contains("電腦", ignoreCase = true) || input.contains("3C", ignoreCase = true)) {
+            keywords.add("筆電")
+            keywords.add("滑鼠")
+            keywords.add("鍵盤")
+            keywords.add("螢幕")
+        }
+
+        // 如果輸入 "吃" 或 "食品"，就加入相關分類
+        if (input.contains("吃", ignoreCase = true) || input.contains("食", ignoreCase = true)) {
+            keywords.add("零食")
+            keywords.add("餅乾")
+            keywords.add("飲料")
+            keywords.add("海鮮") // 像是乾蝦
+        }
+
+        // (你也可以自行擴充其他類別，例如搜「吃的」就多找「零食」、「餅乾」)
+
+        // --- 2. 開始過濾 ---
         val filteredList = allProductList.filter { product ->
-            // 這裡假設你的 Product 物件有一個 name 欄位
-            // 如果你的欄位叫 title，請改成 product.title
+
+            // 取出商品的三大資訊
             val name = product.name ?: ""
-            name.contains(keyword, ignoreCase = true)
+            val description = product.description ?: ""
+            val category = product.category ?: "" // 確保這欄位存在
+
+            // ★ 檢查：只要「商品資訊」符合「搜尋清單」裡的「任何一個字」就算成功
+            // any 意思是：只要符合其中一個條件就回傳 true
+            keywords.any { keywords ->
+                name.contains(keywords, ignoreCase = true) ||
+                        description.contains(keywords, ignoreCase = true) ||
+                        category.contains(keywords, ignoreCase = true)
+            }
         }
 
+        // --- 3. 處理結果 ---
         if (filteredList.isEmpty()) {
-            Toast.makeText(context, "找不到「$keyword」相關商品", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "找不到「$input」相關商品", Toast.LENGTH_SHORT).show()
         }
 
-        // 更新畫面
         adapter.updateData(filteredList)
+        return keywords
     }
     // 新增載入商品的函式
     private fun loadAllProducts() {
