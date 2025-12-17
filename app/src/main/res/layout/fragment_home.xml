@@ -40,7 +40,11 @@
                         android:background="@drawable/bg_searchbar_white"
                         android:ems="10"
                         android:hint="搜尋商品"
-                        android:inputType="text" />
+                        android:inputType="text"
+
+                        android:maxLines="1"
+                        android:imeOptions="actionSearch"
+                        />
 
                     <ImageView
                         android:id="@+id/img_cart"
