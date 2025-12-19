@@ -4,13 +4,10 @@ import com.example.dried_shrimp.data.model.ChatRequest
 import com.example.dried_shrimp.data.model.ChatResponse
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface ChatApiService {
-
-    @Headers("Content-Type: application/json")
-    @POST("/chat")
-    fun sendMessage(@Body req: ChatRequest): Call<ChatResponse>
-
+    // 這裡的 "chat" 對應 Python 裡的 @app.route('/chat')
+    @POST("chat")
+    fun sendMessage(@Body request: ChatRequest): Call<ChatResponse>
 }

@@ -1,6 +1,7 @@
 package com.example.dried_shrimp.ui.activities
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -11,7 +12,7 @@ import com.example.dried_shrimp.ui.fragments.Fragment_Live
 import com.example.dried_shrimp.ui.fragments.Fragment_user2
 import com.example.dried_shrimp.R
 import com.example.dried_shrimp.ui.fragments.Fragment_Category
-import com.example.dried_shrimp.ui.fragments.Fragment_notify
+import com.example.dried_shrimp.ui.fragments.Fragment_ChatList
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 
@@ -50,8 +51,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_live ->{
                     loadFragment(Fragment_Live(), R.id.fragment_container)
                 }
-                R.id.nav_chat ->{
-                    loadFragment(Fragment_notify(), R.id.fragment_container)
+                R.id.nav_chat -> { // 對應 bottom_nav_menu.xml 的 ID
+                    loadFragment(Fragment_ChatList(),R.id.fragment_container)
+                    true
                 }
                 R.id.nav_user -> loadFragment(Fragment_user2(), R.id.fragment_container)
             }
@@ -60,7 +62,6 @@ class MainActivity : AppCompatActivity() {
 
         // ★ 讀取從 Login 傳來的目標
         val target = intent.getStringExtra("Login_successful")
-
         if (target == "fragment_user2") {
             // 直接載入 fragment_user2
             loadFragment(Fragment_user2(), R.id.fragment_container)

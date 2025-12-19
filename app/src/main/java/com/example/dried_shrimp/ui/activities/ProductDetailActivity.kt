@@ -1,5 +1,6 @@
 package com.example.dried_shrimp.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -14,7 +15,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ProductDetailActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityProductDetailBinding
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -42,7 +42,7 @@ class ProductDetailActivity : AppCompatActivity() {
             binding.tvDetailName.text = product.name
             binding.tvDetailPrice.text = "$${product.price}"
             binding.tvDetailStock.text = "庫存: ${product.stock}"
-            binding.tvDetailShipping.text = "運費: $${product.shippingFee}"
+            binding.tvDetailShipping.text = "運費: ${product.shippingFee}"
             binding.tvDetailDescription.text = if (product.description.isEmpty()) "賣家沒有撰寫描述" else product.description
 
             if (product.imageUrl.isNotEmpty()) {
@@ -57,12 +57,57 @@ class ProductDetailActivity : AppCompatActivity() {
             }
         }
 
+        // 3. 加入購物車按鈕 (保留這一個就好，原本下面有一個重複的)
+        binding.btnAddToCart.setOnClickListener {
+            addToCart()
+        }
+
+        // 4. 直接購買按鈕
+        binding.btnDirectBuy.setOnClickListener {
+            directBuy()
+        }
+
         // 返回按鈕
         binding.imgBack.setOnClickListener { finish() }
 
-        // 3. 加入購物車按鈕
-        binding.btnAddToCart.setOnClickListener {
-            addToCart()
+        // ★★★ 修改：聊聊按鈕 (連結到真實賣家) ★★★
+        binding.btnChat.setOnClickListener {
+            // 1. 檢查商品資料是否存在
+            val product = currentProduct
+            if (product == null) {
+                Toast.makeText(this, "商品資料讀取錯誤", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // 2. 檢查使用者是否登入 (未登入不能聊天)
+            if (auth.currentUser == null) {
+                Toast.makeText(this, "請先登入才能使用聊聊功能", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // 3. 防呆：不能跟自己聊天
+            if (product.sellerId == auth.currentUser?.uid) {
+                Toast.makeText(this, "這是您自己的商品，無法進行聊聊", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // 4. 準備跳轉到 ChatMainActivity
+            val intent = Intent(this, ChatMainActivity::class.java)
+
+            // 5. 傳遞關鍵資料
+            // 顯示的標題 (如果有賣場名稱 product.storeName 更好，沒有就顯示 "賣家")
+            intent.putExtra("chat_target_name", "賣家")
+
+            // 賣家的 ID (這最重要！用來區分不同的聊天室)
+            intent.putExtra("chat_target_id", product.sellerId)
+
+            // 告訴聊天室這是 "seller" 模式 (這樣就不會觸發 AI 自動回覆)
+            intent.putExtra("chat_target_type", "seller")
+
+            // 帶入商品名稱，讓輸入框預設填入 "我想詢問關於..."
+            intent.putExtra("product_name", product.name)
+
+            startActivity(intent)
         }
     }
 
@@ -140,5 +185,51 @@ class ProductDetailActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Toast.makeText(this, "連線錯誤: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+    // ★★★ 新增這個函式 ★★★
+    private fun directBuy() {
+        val user = auth.currentUser
+        val product = currentProduct
+
+        // 1. 檢查登入
+        if (user == null) {
+            Toast.makeText(this, "請先登入才能購買", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 2. 檢查商品資料
+        if (product == null) {
+            Toast.makeText(this, "商品資料錯誤", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 3. 防呆：不能買自己的商品
+        if (product.sellerId == user.uid) {
+            Toast.makeText(this, "您不能購買自己的商品", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 4. 檢查庫存
+        if (product.stock <= 0) {
+            Toast.makeText(this, "此商品已售完", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 5. 跳轉到結帳頁面 (CheckoutActivity)
+        // 注意：這裡假設你已經有 CheckoutActivity。如果還沒有，請告訴我，我們需要建立一個。
+        val intent = Intent(this, CheckoutActivity::class.java)
+
+        // 6. 傳遞商品資訊過去
+        intent.putExtra("product_id", product.id)
+        intent.putExtra("product_name", product.name)
+        intent.putExtra("product_price", product.price)
+        intent.putExtra("product_image", product.imageUrl)
+        intent.putExtra("seller_id", product.sellerId)
+        intent.putExtra("quantity", 1) // 直接購買預設數量為 1
+
+        // ★ 關鍵標記：告訴結帳頁，這是「直接購買」(不用去讀購物車資料庫)
+        intent.putExtra("is_direct_buy", true)
+
+        startActivity(intent)
     }
 }

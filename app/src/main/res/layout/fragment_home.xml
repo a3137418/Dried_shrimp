@@ -50,15 +50,9 @@
                         android:id="@+id/img_cart"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:layout_weight="1"
+
                         app:srcCompat="@drawable/shopping_cart" />
 
-                    <ImageView
-                        android:id="@+id/img_chat"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_weight="1"
-                        app:srcCompat="@drawable/chat" />
 
                 </LinearLayout>
 

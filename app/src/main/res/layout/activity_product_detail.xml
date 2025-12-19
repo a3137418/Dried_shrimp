@@ -135,6 +135,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
+            android:id="@+id/btnChat"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -166,6 +167,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/btnDirectBuy"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

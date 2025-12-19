@@ -42,7 +42,7 @@ class Fragment_Home: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         var etserach = _binding?.etserach
         var img_cart = _binding?.imgCart
-        var img_chat = _binding?.imgChat
+
         var recycle_home =_binding?.recycleHome
         // --- 修改開始：設定新的 Adapter ---
         adapter = HomeProductAdapter(emptyList()) // 一開始先給空清單

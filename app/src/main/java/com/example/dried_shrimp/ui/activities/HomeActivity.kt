@@ -54,7 +54,6 @@ class HomeActivity : AppCompatActivity() {
     fun findview(){
         etserach =findViewById(R.id.etserach)
         img_serach = findViewById(R.id.img_cart)
-        img_chat = findViewById(R.id.img_chat)
         recycle_home =findViewById(R.id.recycle_home)
 
     }
