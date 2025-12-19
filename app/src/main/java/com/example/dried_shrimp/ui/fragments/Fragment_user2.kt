@@ -22,7 +22,8 @@ import com.example.dried_shrimp.ui.activities.MyStoreActivity
 import com.example.dried_shrimp.ui.activities.RegisterActivity
 import com.example.dried_shrimp.ui.activities.ShoppingCartActivity
 import com.example.dried_shrimp.ui.activities.TabbedPurchaseListActivity
-import com.example.dried_shrimp.ui.adapters.HomeProductAdapter
+import com.example.dried_shrimp.R
+import com.example.dried_shrimp.ui.activities.EditProfileActivity
 import com.example.dried_shrimp.ui.adapters.UserServiceAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -65,48 +66,103 @@ class Fragment_user2 : Fragment() {
         val b = binding ?: return
         val user = FirebaseAuth.getInstance().currentUser
 
-        // 這兩個是 <include> 對應的 binding
         val guestRoot = b.viewUserGuest.root
         val loginRoot = b.viewUserLogin.root
 
         if (user == null) {
-            // === 未登入狀態 ===
+            // ... (未登入邏輯保持不變) ...
             guestRoot.visibility = View.VISIBLE
             loginRoot.visibility = View.GONE
-
-            // --- 新增這行：把「我的賣場」隱藏起來 ---
             b.MyStore.visibility = View.GONE
-
         } else {
             // === 已登入狀態 ===
             guestRoot.visibility = View.GONE
             loginRoot.visibility = View.VISIBLE
-
-            // --- 新增這行：把「我的賣場」顯示出來 ---
             b.MyStore.visibility = View.VISIBLE
 
-            // 已登入 layout 裡的元件設定...
-            val tvUserName: TextView = b.viewUserLogin.tvUserName
-            val tvUserEmail: TextView = b.viewUserLogin.tvUserEmail
-            val imgMyaccountLogin: ImageView = b.viewUserLogin.imgMyaccountLogin
-            val btnLogout: Button = b.viewUserLogin.btnLogout
+            // 1. 綁定 UI 元件 (原本的)
+            val tvUserName = b.viewUserLogin.tvUserName
+            val tvUserEmail = b.viewUserLogin.tvUserEmail
+            val imgMyaccountLogin = b.viewUserLogin.imgMyaccountLogin
+            val btnLogout = b.viewUserLogin.btnLogout
 
+            // ★ 新增：綁定新的編輯圖示
+            // 注意：因為這是 include 進來的，如果找不到 ID，可能需要檢查 view_user_login.xml 是否已存檔
+            val imgEditAvatar = b.viewUserLogin.imgEditAvatar
+            val imgEditName = b.viewUserLogin.imgEditName
+
+            // 2. 顯示資料
             tvUserName.text = user.displayName ?: "皮蝦用戶"
             tvUserEmail.text = user.email ?: ""
-            // (B) 設定大頭貼 (如果有 Imageview 叫 imgStoreAvatar)
+
             if (user.photoUrl != null) {
-                Glide.with(this)
-                    .load(user.photoUrl)
-                    .circleCrop() // 圓形剪裁
-                    .into(imgMyaccountLogin)
+                Glide.with(this).load(user.photoUrl).circleCrop().into(imgMyaccountLogin)
+            } else {
+                imgMyaccountLogin.setImageResource(R.drawable.user)
             }
+
+            // 3. 設定點擊事件 -> 跳轉到 AccountSettingActivity
+            val editProfileIntent = Intent(requireContext(), EditProfileActivity::class.java)
+
+            // 讓這四個元件點了都能去設定頁
+            imgMyaccountLogin.setOnClickListener { startActivity(editProfileIntent) }
+            tvUserName.setOnClickListener { startActivity(editProfileIntent) }
+
+            // ★ 新增：新圖示的點擊事件
+            imgEditAvatar.setOnClickListener { startActivity(editProfileIntent) }
+            imgEditName.setOnClickListener { startActivity(editProfileIntent) }
+
+            // 登出
             btnLogout.setOnClickListener {
                 FirebaseAuth.getInstance().signOut()
-                updateUserUi() // 登出後重新整理 UI，賣場按鈕會自動消失
+                updateUserUi()
             }
+            // ★★★ 新增：呼叫同步 Google 頭像的函式 ★★★
+            checkAndSyncGooglePhoto(user)
         }
     }
 
+    // ★★★ 新增這個函式：自動將 Google 頭像同步到 Firestore ★★★
+    private fun checkAndSyncGooglePhoto(user: com.google.firebase.auth.FirebaseUser) {
+        val googlePhotoUrl = user.photoUrl?.toString()
+
+        // 1. 如果 Google 帳號本身沒頭像，就不用同步了
+        if (googlePhotoUrl.isNullOrEmpty()) return
+
+        val userRef = db.collection("users").document(user.uid)
+
+        // 2. 讀取 Firestore 目前的資料
+        userRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val dbPhoto = document.getString("photoUrl")
+                val dbImage = document.getString("imageUrl")
+
+                // 3. 如果資料庫裡完全沒照片 (null 或空字串)
+                if (dbPhoto.isNullOrEmpty() && dbImage.isNullOrEmpty()) {
+                    // 4. 自動把 Google 的照片寫進去
+                    val updates = hashMapOf<String, Any>(
+                        "photoUrl" to googlePhotoUrl,
+                        "imageUrl" to googlePhotoUrl,
+                        "name" to (user.displayName ?: "皮蝦用戶") // 順便同步名字
+                    )
+
+                    userRef.set(updates, com.google.firebase.firestore.SetOptions.merge())
+                        .addOnSuccessListener {
+                            android.util.Log.d("SyncPhoto", "Google 頭像已同步到 Firestore")
+                        }
+                }
+            } else {
+                // 5. 如果連文件都沒有 (例如剛註冊)，直接建立
+                val newUser = hashMapOf<String, Any>(
+                    "photoUrl" to googlePhotoUrl,
+                    "imageUrl" to googlePhotoUrl,
+                    "name" to (user.displayName ?: "皮蝦用戶"),
+                    "email" to (user.email ?: "")
+                )
+                userRef.set(newUser, com.google.firebase.firestore.SetOptions.merge())
+            }
+        }
+    }
     /**
      * 設定 RecyclerView（更多服務 / 猜你喜歡）
      */

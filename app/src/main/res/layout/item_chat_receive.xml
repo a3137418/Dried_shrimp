@@ -7,7 +7,7 @@
     android:padding="8dp">
 
     <ImageView
-        android:id="@+id/ivAvatarReceive"
+        android:id="@+id/ivAvatar"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:src="@drawable/chat"
@@ -27,7 +27,7 @@
         android:backgroundTint="#E0E0E0"
         app:layout_constrainedWidth="true"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@id/ivAvatarReceive"
+        app:layout_constraintStart_toEndOf="@id/ivAvatar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintWidth_percent="0.7" />

@@ -53,6 +53,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-firestore-ktx")
     implementation ("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-storage-ktx")
     implementation(libs.firebase.database)
     // 2. 【關鍵！】加入 Firestore 資料庫功能
     implementation("com.google.firebase:firebase-firestore")

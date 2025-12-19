@@ -57,10 +57,7 @@ class Fragment_ChatList : Fragment() {
      */
     private fun loadChatRooms() {
         val currentUser = auth.currentUser
-        if (currentUser == null) {
-            Log.e("ChatList", "User not logged in")
-            return
-        }
+        if (currentUser == null) return
 
         val userId = currentUser.uid
 
@@ -74,7 +71,7 @@ class Fragment_ChatList : Fragment() {
                     return@addSnapshotListener
                 }
 
-                if (snapshot != null && !snapshot.isEmpty) {
+                if (snapshot != null) {
                     chatRooms.clear()
 
                     for (doc in snapshot.documents) {
@@ -84,27 +81,54 @@ class Fragment_ChatList : Fragment() {
                             val participantId = doc.getString("participantId") ?: ""
                             val participantType = doc.getString("participantType") ?: "ai"
                             val timestamp = doc.getTimestamp("lastMessageTime")
-
-                            // 格式化時間
                             val timeStr = formatTimestamp(timestamp)
 
+                            // 1. 先建立基本的 Item (圖片先空著)
                             val chatRoomItem = ChatRoomItem(
                                 id = doc.id,
                                 name = chatName,
+                                targetId = participantId,
                                 lastMessage = lastMessage,
                                 time = timeStr,
-                                icon = if (participantType == "ai") R.drawable.chat else R.drawable.user
+                                icon = if (participantType == "ai") R.drawable.chat else R.drawable.user,
+                                avatarUrl = "" // 先設為空
                             )
 
                             chatRooms.add(chatRoomItem)
 
+                            // 2. 如果不是 AI，額外去抓取頭像
+                            if (participantType != "ai" && participantId.isNotEmpty()) {
+                                fetchUserAvatar(participantId, chatRooms.size - 1)
+                            }
+
                         } catch (ex: Exception) {
-                            Log.e("ChatList", "Failed to parse chat room", ex)
+                            Log.e("ChatList", "Error", ex)
                         }
                     }
-
                     adapter.notifyDataSetChanged()
-                    Log.d("ChatList", "Loaded ${chatRooms.size} chat rooms")
+                }
+            }
+    }
+    // ★★★ 新增：抓取使用者頭像的函式 ★★★
+    private fun fetchUserAvatar(targetUserId: String, position: Int) {
+        db.collection("users").document(targetUserId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    // 抓取 photoUrl 或 imageUrl
+                    val url = document.getString("photoUrl") ?: document.getString("imageUrl")
+
+                    if (!url.isNullOrEmpty()) {
+                        // 1. 確保列表沒有被清空或 index 跑掉
+                        if (position < chatRooms.size) {
+                            val item = chatRooms[position]
+                            // 2. 雙重確認 ID 是否匹配 (避免網路延遲導致更新錯人)
+                            if (item.targetId == targetUserId) {
+                                item.avatarUrl = url
+                                // 3. 只更新這一行，避免整個畫面閃爍
+                                adapter.notifyItemChanged(position)
+                            }
+                        }
+                    }
                 }
             }
     }
@@ -115,7 +139,13 @@ class Fragment_ChatList : Fragment() {
     private fun navigateToChatRoom(item: ChatRoomItem) {
         val intent = Intent(requireContext(), ChatMainActivity::class.java)
         intent.putExtra("chat_target_name", item.name)
-        intent.putExtra("chat_target_id", item.id.substringAfterLast("_"))
+
+        // ★ 關鍵 1：直接使用我們存好的 targetId，不要用 substring 去猜
+        intent.putExtra("chat_target_id", item.targetId)
+
+        // ★ 關鍵 2：直接傳送 Room ID，確保雙方進入同一個房間
+        intent.putExtra("chat_room_id", item.id)
+
         intent.putExtra("chat_target_type", if (item.id.contains("ai_service")) "ai" else "seller")
         startActivity(intent)
     }

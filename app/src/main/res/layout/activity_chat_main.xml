@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
-    android:fitsSystemWindows="true"> <androidx.constraintlayout.widget.ConstraintLayout
+    android:fitsSystemWindows="true">
+    <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/headerLayout"
     android:layout_width="match_parent"
     android:layout_height="56dp"

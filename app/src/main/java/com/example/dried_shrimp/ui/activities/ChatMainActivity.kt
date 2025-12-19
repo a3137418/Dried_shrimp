@@ -50,15 +50,22 @@ class ChatMainActivity : AppCompatActivity() {
         val productName = intent.getStringExtra("product_name")
         chatTargetId = intent.getStringExtra("chat_target_id") ?: "ai_service"
         chatTargetType = intent.getStringExtra("chat_target_type") ?: "ai"
-
+        val passedRoomId = intent.getStringExtra("chat_room_id")
         binding.tvChatTitle.text = chatTargetName
 
-        // 取得當前使用者 ID
+        // 2. 取得當前使用者 ID
         val currentUser = auth.currentUser
         if (currentUser != null) {
             currentUserId = currentUser.uid
-            // 建立聊天室 ID (使用者_對方)
-            chatRoomId = "chat_${currentUserId}_${chatTargetId}"
+
+            // 3. 決定 Room ID
+            if (passedRoomId != null) {
+                // 如果有傳 ID 過來，就直接用 (解決買賣家 ID 不一致問題)
+                chatRoomId = passedRoomId
+            } else {
+                // 如果沒傳 (例如從商品頁新發起的)，才用算的
+                chatRoomId = "chat_${currentUserId}_${chatTargetId}"
+            }
         } else {
             Toast.makeText(this, "請先登入", Toast.LENGTH_SHORT).show()
             finish()
@@ -71,18 +78,43 @@ class ChatMainActivity : AppCompatActivity() {
 
         setupRecyclerView()
         setupListeners()
-
         // 初始化聊天室(如果不存在)
         initializeChatRoom(chatTargetName)
-
         // 開始監聽訊息
         listenToMessages()
+        loadOpponentProfile()
 
-        if (!productName.isNullOrEmpty()) {
-            binding.etMessage.setText("你好,我想詢問關於「$productName」的細節。")
-        }
+
     }
+    // 修改 ChatMainActivity.kt 的這個函式
+    private fun loadOpponentProfile() {
+        // Log 1: 確認有開始執行
+        Log.d("ChatDebug", "準備載入對方頭像，對方 ID: $chatTargetId, 類型: $chatTargetType")
 
+        if (chatTargetType == "ai") return
+
+        db.collection("users").document(chatTargetId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    // 嘗試抓取 photoUrl 或 imageUrl
+                    val url = document.getString("photoUrl") ?: document.getString("imageUrl") ?: ""
+
+                    // Log 2: 確認資料庫裡存的網址是什麼
+                    Log.d("ChatDebug", "從 Firestore 抓到的圖片網址: $url")
+
+                    if (url.isNotEmpty()) {
+                        chatAdapter.setOpponentAvatar(url)
+                    } else {
+                        Log.d("ChatDebug", "網址是空的，顯示預設圖")
+                    }
+                } else {
+                    Log.d("ChatDebug", "找不到該使用者的文件 (User Document 不存在)")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatDebug", "讀取資料庫失敗", e)
+            }
+    }
     private fun setupListeners() {
         binding.btnBack.setOnClickListener {
             finish()
@@ -123,26 +155,21 @@ class ChatMainActivity : AppCompatActivity() {
             .collection("chatRooms")
             .document(chatRoomId)
             .set(chatRoomData, com.google.firebase.firestore.SetOptions.merge())
-            .addOnSuccessListener {
-                Log.d("ChatActivity", "Chat room initialized for user")
-            }
-            .addOnFailureListener { e ->
-                Log.e("ChatActivity", "Failed to initialize chat room", e)
-            }
 
         // 如果是與賣家聊天,也在賣家那邊建立聊天室
         if (chatTargetType == "seller") {
             val sellerChatRoomData = hashMapOf(
-                "chatName" to getUserName(), // 買家名稱
-                "participantId" to currentUserId,
+                "chatName" to getUserName(), // 在賣家那邊，顯示買家的名字
+                "participantId" to currentUserId, // 對話對象是買家
                 "participantType" to "buyer",
                 "lastMessage" to "",
                 "lastMessageTime" to com.google.firebase.Timestamp.now(),
                 "createdAt" to com.google.firebase.Timestamp.now()
             )
 
-            db.collection("sellers")
-                .document(chatTargetId)
+            // 修正：db.collection("sellers") -> db.collection("users")
+            db.collection("users")
+                .document(chatTargetId) // 賣家的 UID
                 .collection("chatRooms")
                 .document(chatRoomId)
                 .set(sellerChatRoomData, com.google.firebase.firestore.SetOptions.merge())
@@ -249,37 +276,28 @@ class ChatMainActivity : AppCompatActivity() {
             "timestamp" to timestamp
         )
 
-        Log.d("ChatActivity", "Saving message - senderId: $senderId, text: $text")
-
-        // 1. 儲存到當前使用者的聊天室
+        // 1. 儲存到當前使用者的聊天室 (保持不變)
         db.collection("users")
             .document(currentUserId)
             .collection("chatRooms")
             .document(chatRoomId)
             .collection("messages")
             .add(newMessage)
-            .addOnSuccessListener { documentReference ->
-                Log.d("ChatActivity", "Message saved to user's chat room: ${documentReference.id}")
-
-                // 更新聊天室的最後訊息
+            .addOnSuccessListener {
                 updateChatRoomLastMessage(text, timestamp)
             }
-            .addOnFailureListener { e ->
-                Log.e("ChatActivity", "Failed to save message", e)
-            }
 
-        // 2. 如果是與賣家聊天,也儲存到賣家的聊天室
+        // ★★★ 修正這裡：如果是與賣家聊天，也儲存到賣家的 "users" 集合 ★★★
         if (chatTargetType == "seller") {
-            db.collection("sellers")
-                .document(chatTargetId)
+            // 修正：db.collection("sellers") -> db.collection("users")
+            db.collection("users")
+                .document(chatTargetId) // 賣家的 UID
                 .collection("chatRooms")
-                .document(chatRoomId)
+                .document(chatRoomId) // 使用相同的 Room ID
                 .collection("messages")
                 .add(newMessage)
                 .addOnSuccessListener {
                     Log.d("ChatActivity", "Message saved to seller's chat room")
-
-                    // 更新賣家那邊的最後訊息
                     updateSellerChatRoomLastMessage(text, timestamp)
                 }
         }
@@ -310,7 +328,8 @@ class ChatMainActivity : AppCompatActivity() {
             "lastMessageTime" to timestamp
         )
 
-        db.collection("sellers")
+        // ★★★ 修正：db.collection("sellers") -> db.collection("users") ★★★
+        db.collection("users")
             .document(chatTargetId)
             .collection("chatRooms")
             .document(chatRoomId)

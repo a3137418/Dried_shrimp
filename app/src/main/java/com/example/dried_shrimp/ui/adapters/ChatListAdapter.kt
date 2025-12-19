@@ -3,6 +3,7 @@ package com.example.dried_shrimp.ui.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.dried_shrimp.data.model.ChatRoomItem
 import com.example.dried_shrimp.databinding.ItemChatRoomBinding
 
@@ -33,9 +34,21 @@ class ChatListAdapter(
             binding.tvUserName.text = item.name
             binding.tvLastMessage.text = item.lastMessage
             binding.tvTime.text = item.time
-            binding.ivAvatar.setImageResource(item.icon)
 
-            // 設定點擊事件
+            // ★★★ 修改圖片載入邏輯 ★★★
+            if (item.avatarUrl.isNotEmpty()) {
+                // 1. 如果有網址，用 Glide 載入
+                Glide.with(itemView.context)
+                    .load(item.avatarUrl)
+                    .placeholder(item.icon) // 載入中顯示預設圖
+                    .error(item.icon)       // 失敗顯示預設圖
+                    .circleCrop()
+                    .into(binding.ivAvatar)
+            } else {
+                // 2. 沒網址，顯示預設圖 (R.drawable.user 或 R.drawable.chat)
+                binding.ivAvatar.setImageResource(item.icon)
+            }
+
             binding.root.setOnClickListener {
                 onItemClick(item)
             }

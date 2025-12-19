@@ -1,47 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/user_login_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:padding="8dp">
 
     <ImageView
-        android:id="@+id/img_myaccount_login"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginEnd="12dp"
-        android:background="@drawable/bg_round_gray"
+        android:id="@+id/imgMyaccountLogin"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/user"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/avatar" />
+        android:background="@drawable/bg_circle_white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-    <LinearLayout
-        android:layout_width="0dp"
+    <ImageView
+        android:id="@+id/imgEditAvatar"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="@drawable/bg_circle_white"
+        android:padding="4dp"
+        app:tint="#757575"
+        app:layout_constraintBottom_toBottomOf="@id/imgMyaccountLogin"
+        app:layout_constraintEnd_toEndOf="@id/imgMyaccountLogin" />
+
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_marginStart="16dp"
+        android:text="使用者名稱"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toEndOf="@id/imgMyaccountLogin"
+        app:layout_constraintTop_toTopOf="@id/imgMyaccountLogin"
+        app:layout_constraintBottom_toTopOf="@id/tvUserEmail"
+        app:layout_constraintVertical_chainStyle="packed"/>
 
-        <TextView
-            android:id="@+id/tvUserName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="皮蝦用戶"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+    <ImageView
+        android:id="@+id/imgEditName"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:src="@android:drawable/ic_menu_edit"
+        app:tint="#757575"
+        app:layout_constraintStart_toEndOf="@id/tvUserName"
+        app:layout_constraintTop_toTopOf="@id/tvUserName"
+        app:layout_constraintBottom_toBottomOf="@id/tvUserName"/>
 
-        <TextView
-            android:id="@+id/tvUserEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="user@example.com"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tvUserEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:text="email@example.com"
+        android:textSize="14sp"
+        android:textColor="#757575"
+        app:layout_constraintStart_toEndOf="@id/imgMyaccountLogin"
+        app:layout_constraintTop_toBottomOf="@id/tvUserName"
+        app:layout_constraintBottom_toBottomOf="@id/imgMyaccountLogin"/>
 
     <Button
         android:id="@+id/btnLogout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="登出" />
-</LinearLayout>
+        android:layout_height="40dp"
+        android:text="登出"
+        android:textSize="12sp"
+        android:backgroundTint="#BDBDBD"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,10 +1,11 @@
 package com.example.dried_shrimp.data.model
 
-// 這裡必須是 data class，而且變數名稱要跟 Adapter 呼叫的一模一樣
 data class ChatRoomItem(
-    val id: String,        // 聊天室 ID
+    val id: String,        // 這是 Room ID (例如 chat_userA_userB)
     val name: String,      // 對方名稱
+    val targetId: String,  // ★ 新增：對方的 UID
     val lastMessage: String,
     val time: String,
-    val icon: Int          // 圖示資源 ID
+    val icon: Int,
+    var avatarUrl: String = ""
 )

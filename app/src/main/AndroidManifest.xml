@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Dried_shrimp">
         <activity
+            android:name=".ui.activities.EditProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activities.ChatMainActivity"
             android:exported="false" />
         <activity
