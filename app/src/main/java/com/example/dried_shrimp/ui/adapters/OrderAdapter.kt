@@ -1,5 +1,6 @@
 package com.example.dried_shrimp.ui.adapters
 
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dried_shrimp.data.model.Order
 import com.example.dried_shrimp.databinding.ItemOrderBinding
+import com.example.dried_shrimp.ui.activities.ReviewActivity
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -74,19 +76,26 @@ class OrderAdapter(
                     }
                 }
                 "COMPLETED" -> {
-                    tvOrderStatus.text = "狀態: 已完成"
-                    btnAction.visibility = View.VISIBLE
-                    btnAction.text = "已完成"
-                    btnAction.isEnabled = false
-                }
-                else -> {
-                    tvOrderStatus.text = "狀態: ${order.status}"
-                    btnAction.visibility = View.GONE
+                    tvOrderStatus.text = "已完成"
+                    btnAction.visibility = android.view.View.VISIBLE
+
+                    // 🔥 這裡決定顯示什麼按鈕
+                    if (order.hasReviewed) {
+                        btnAction.text = "已評價"
+                        btnAction.isEnabled = false // 或跳轉到查看頁面
+                    } else {
+                        btnAction.text = "去評價"
+                        btnAction.isEnabled = true
+                        // 🔥 點擊跳轉到評價頁面
+                        btnAction.setOnClickListener {
+                            val context = holder.itemView.context
+                            val intent = Intent(context, ReviewActivity::class.java)
+                            intent.putExtra("ORDER_DATA", order)
+                            context.startActivity(intent)
+                        }
+                    }
                 }
             }
-
-            // 3. 綁定按鈕點擊事件
-            btnAction.setOnClickListener { onActionClick(order) }
         }
     }
 

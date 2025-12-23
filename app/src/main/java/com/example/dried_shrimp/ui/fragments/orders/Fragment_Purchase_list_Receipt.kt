@@ -48,7 +48,7 @@ class Fragment_Purchase_list_Receipt: Fragment() {
         binding?.sectionGuesslike?.myRecycleLike?.adapter = guesslike_Adapter
         loadAllProducts()
 
-        // 2. 設定訂單列表
+        // 2. 設定訂單列表8
         val currentUserId = auth.currentUser?.uid ?: ""
 
         adapter = OrderAdapter(emptyList(), currentUserId) { order ->
@@ -64,32 +64,51 @@ class Fragment_Purchase_list_Receipt: Fragment() {
     }
     // 買家確認收貨的動作
     // ★★★ 關鍵修改：使用 Batch 寫入歷史資料 ★★★
+    // 買家確認收貨：從「進行中」移除 -> 移動到「歷史紀錄」
     private fun confirmReceipt(order: Order) {
         val batch = db.batch()
 
-        // 1. 全域
-        val globalRef = db.collection("orders").document(order.orderId)
-        batch.update(globalRef, "status", "COMPLETED")
-
-        // 2. 買家
-        val buyerRef = db.collection("users").document(order.buyerId)
+        // 1. 鎖定「來源」：買家的進行中訂單 (原本的位置)
+        val buyerSourceRef = db.collection("users").document(order.buyerId)
             .collection("orders").document(order.orderId)
-        batch.update(buyerRef, "status", "COMPLETED")
 
-        // 3. 賣家 (★ 重要：也要通知賣家訂單完成了)
+        // 2. 鎖定「目的」：買家的歷史訂單 (新的位置)
+        val buyerHistoryRef = db.collection("users").document(order.buyerId)
+            .collection("history_orders").document(order.orderId)
+
+        // 3. 全域訂單與賣家訂單 (這兩者通常只更新狀態，不一定需要移動，視您需求而定)
+        val globalRef = db.collection("orders").document(order.orderId)
         val sellerRef = db.collection("users").document(order.sellerId)
             .collection("orders").document(order.orderId)
+
+        // 4. 準備新資料 (狀態改為 COMPLETED)
+        // ⚠️ hasReviewed 預設為 false 是正確的，因為剛收貨還沒評價
+        val completedOrder = order.copy(
+            status = "COMPLETED",
+            timestamp = System.currentTimeMillis()
+        )
+
+        // --- 執行批次操作 ---
+
+        // A. 【新增】到買家歷史紀錄
+        batch.set(buyerHistoryRef, completedOrder)
+
+        // B. 【刪除】買家進行中訂單 (🔥 這是讓它從「待收貨」列表消失的關鍵)
+        batch.delete(buyerSourceRef)
+
+        // C. 【更新】全域與賣家狀態
+        batch.update(globalRef, "status", "COMPLETED")
         batch.update(sellerRef, "status", "COMPLETED")
 
-        // 4. 歷史紀錄 (原本的功能)
-        val userHistoryRef = db.collection("users").document(order.buyerId)
-            .collection("history_orders").document(order.orderId)
-        batch.set(userHistoryRef, order.copy(status = "COMPLETED"))
-
+        // 5. 提交交易
         batch.commit()
             .addOnSuccessListener {
-                Toast.makeText(context, "訂單完成！", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "訂單完成！已移至歷史紀錄", Toast.LENGTH_SHORT).show()
+                // 成功後重新載入列表，介面上的該筆訂單就會消失
                 loadOrders()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "操作失敗: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
     private fun loadOrders() {
