@@ -54,78 +54,87 @@ class CheckoutActivity : AppCompatActivity() {
     }
 
     private fun submitOrder() {
-        val name = binding.etReceiverName.text.toString().trim()
-        val phone = binding.etReceiverPhone.text.toString().trim()
-        val address = binding.etReceiverAddress.text.toString().trim()
-        val buyerId = auth.currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
+        val batch = db.batch() // 使用 Batch 確保全部成功或全部失敗
+        val currentUser = FirebaseAuth.getInstance().currentUser
 
-        if (name.isEmpty() || phone.isEmpty() || address.isEmpty()) {
-            Toast.makeText(this, "請填寫完整收件資訊", Toast.LENGTH_SHORT).show()
-            return
-        }
+        // 取得前一頁傳來的商品列表 (只包含已勾選的)
+        val checkoutItems = intent.getSerializableExtra("CART_ITEMS") as? ArrayList<CartItem> ?: return
 
-        binding.btnSubmitOrder.isEnabled = false
-        binding.btnSubmitOrder.text = "處理中..."
+        if (checkoutItems.isEmpty()) return
 
-        val batch = db.batch()
+        // 🔥 關鍵邏輯：迴圈針對「每一個商品」建立一張獨立訂單
+        for (item in checkoutItems) {
 
-        // ★★★ 關鍵邏輯：依照賣家 ID 將商品分組 (拆單) ★★★
-        val groupedItems = cartItems.groupBy { it.sellerId }
+            // 1. 產生新的 Order ID
+            val newOrderId = db.collection("orders").document().id
 
-        // 針對每一組 (每一個賣家)，建立一張獨立的訂單
-        for ((sellerId, items) in groupedItems) {
+            // 2. 計算單項總價
+            val itemTotal = item.price * item.quantity
 
-            // 1. 產生訂單 ID
-            val orderRef = db.collection("orders").document()
-            val orderId = orderRef.id
-
-            // 2. 計算該賣家這張單的總金額
-            val subTotal = items.sumOf { it.price * it.quantity }
-
+            // 3. 建立 Order 物件 (只包含這一個商品)
             val newOrder = Order(
-                orderId = orderId,
-                buyerId = buyerId,
-                sellerId = sellerId, // 寫入賣家 ID
-                items = items,
-                totalPrice = subTotal, // 這裡存的是該張分單的金額
-                receiverName = name,
-                receiverPhone = phone,
-                receiverAddress = address,
-                status = "PENDING",
-                timestamp = System.currentTimeMillis()
+                orderId = newOrderId,
+                buyerId = currentUser?.uid ?: "",
+                sellerId = item.sellerId, // 確保這張單只屬於該商品的賣家
+                items = listOf(item),     // 清單內只有這一個 CartItem
+                totalPrice = itemTotal,
+                status = "PENDING",       // 初始狀態
+                timestamp = System.currentTimeMillis(),
+                hasReviewed = false
             )
 
-            // 3. 寫入路徑 A：全域 orders (方便管理員查看，或產生唯一 ID)
-            batch.set(orderRef, newOrder)
+            // 4. 寫入三個路徑 (全域、買家、賣家)
+            val globalRef = db.collection("orders").document(newOrderId)
+            batch.set(globalRef, newOrder)
 
-            // 4. 寫入路徑 B：買家的訂單 (users -> buyer -> orders -> orderId)
-            val buyerOrderRef = db.collection("users").document(buyerId)
-                .collection("orders").document(orderId)
-            batch.set(buyerOrderRef, newOrder)
+            val buyerRef = db.collection("users").document(newOrder.buyerId)
+                .collection("orders").document(newOrderId)
+            batch.set(buyerRef, newOrder)
 
-            // 5. 寫入路徑 C：賣家的訂單 (users -> seller -> orders -> orderId)
-            // 這樣賣家只需要讀取自己下面的 orders 集合，就看不到別人的訂單了
-            val sellerOrderRef = db.collection("users").document(sellerId)
-                .collection("orders").document(orderId)
-            batch.set(sellerOrderRef, newOrder)
+            if (newOrder.sellerId.isNotEmpty()) {
+                val sellerRef = db.collection("users").document(newOrder.sellerId)
+                    .collection("orders").document(newOrderId)
+                batch.set(sellerRef, newOrder)
+            }
         }
 
-        // 6. 清空購物車 (針對所有商品)
-        for (item in cartItems) {
-            val cartRef = db.collection("users").document(buyerId)
-                .collection("cart").document(item.productId)
-            batch.delete(cartRef)
-        }
-
+        // 5. 提交並清空購物車
         batch.commit()
             .addOnSuccessListener {
-                Toast.makeText(this, "下單成功！已依賣家拆分訂單", Toast.LENGTH_LONG).show()
+                // 清除購物車中「已購買」的商品 (透過 Batch 再跑一次刪除)
+                clearPurchasedItemsFromCart(checkoutItems)
+
+                Toast.makeText(this, "訂單建立成功！請前往付款", Toast.LENGTH_SHORT).show()
+                // 這裡看您流程，通常是跳回訂單列表，或是跳到付款頁
+                // 如果是跳到付款頁，因為有多張訂單，通常會先跳回列表讓使用者逐一付款
                 finish()
             }
+            .addOnFailureListener {
+                Toast.makeText(this, "下單失敗: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+    private fun clearPurchasedItemsFromCart(purchasedItems: List<com.example.dried_shrimp.data.model.CartItem>) {
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val batch = db.batch() // 使用批次處理一次刪除多筆
+
+        for (item in purchasedItems) {
+            // 鎖定購物車路徑：users -> {uid} -> cart -> {productId}
+            val cartItemRef = db.collection("users").document(userId)
+                .collection("cart").document(item.productId)
+
+            // 加入刪除排程
+            batch.delete(cartItemRef)
+        }
+
+        // 提交刪除
+        batch.commit()
+            .addOnSuccessListener {
+                android.util.Log.d("Checkout", "購物車已清理完畢")
+            }
             .addOnFailureListener { e ->
-                binding.btnSubmitOrder.isEnabled = true
-                binding.btnSubmitOrder.text = "確認下單"
-                Toast.makeText(this, "下單失敗: ${e.message}", Toast.LENGTH_SHORT).show()
+                android.util.Log.e("Checkout", "清理購物車失敗", e)
             }
     }
 }

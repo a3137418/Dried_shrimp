@@ -13,12 +13,15 @@ import com.example.dried_shrimp.data.model.Product
 import com.example.dried_shrimp.databinding.ActivityProductDetailBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.dried_shrimp.ui.adapters.ProductReviewAdapter
+import com.example.dried_shrimp.data.model.Review // 確保有這行
 class ProductDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProductDetailBinding
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private var currentProduct: Product? = null
+    private lateinit var reviewAdapter: ProductReviewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +31,14 @@ class ProductDetailActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+        // 1. 初始化 RecyclerView
+        setupReviewList()
+        // 2. 載入評價 (假設您有取得 productId)
+        // 這裡請確認您原本是怎麼取得 productId 的，通常是 intent.getStringExtra("PRODUCT_ID")
+        val productId = intent.getStringExtra("PRODUCT_ID")
+        if (productId != null) {
+            loadProductReviews(productId)
         }
         setupListener()
     }
@@ -231,5 +242,39 @@ class ProductDetailActivity : AppCompatActivity() {
         intent.putExtra("is_direct_buy", true)
 
         startActivity(intent)
+    }
+    private fun setupReviewList() {
+        reviewAdapter = ProductReviewAdapter(emptyList())
+        // 請確認您的 XML 裡面的 RecyclerView ID 是 rvProductReviews
+        binding.rvProductReviews.apply {
+            layoutManager = LinearLayoutManager(this@ProductDetailActivity)
+            adapter = reviewAdapter
+        }
+    }
+
+    private fun loadProductReviews(productId: String) {
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+
+        db.collection("reviews")
+            .whereEqualTo("productId", productId)
+            .get()
+            .addOnSuccessListener { result ->
+                if (!result.isEmpty) {
+                    val reviewList = result.toObjects(Review::class.java)
+                    // 按照時間新到舊排序
+                    val sortedList = reviewList.sortedByDescending { it.timestamp }
+
+                    reviewAdapter.updateData(sortedList)
+
+                    // 更新標題旁的數量，例如：商品評價 (5)
+                    // 請確認您的 XML 裡有這個 ID: tvReviewCount
+                    binding.tvReviewCount.text = "(${sortedList.size})"
+                } else {
+                    binding.tvReviewCount.text = "(0)"
+                }
+            }
+            .addOnFailureListener { e ->
+                android.util.Log.e("ProductDetail", "評價載入失敗", e)
+            }
     }
 }

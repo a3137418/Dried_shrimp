@@ -3,6 +3,9 @@ package com.example.dried_shrimp.ui.activities
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.example.dried_shrimp.R
 import com.example.dried_shrimp.data.model.Order
 import com.example.dried_shrimp.databinding.ActivityPaymentBinding
 import com.google.firebase.firestore.FirebaseFirestore
@@ -19,7 +22,11 @@ class PaymentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityPaymentBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
         // 1. 接收訂單資料 (從 Intent 取得)
         currentOrder = intent.getSerializableExtra("ORDER_DATA") as? Order
 

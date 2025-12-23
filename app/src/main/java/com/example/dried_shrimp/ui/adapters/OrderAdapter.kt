@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dried_shrimp.data.model.Order
 import com.example.dried_shrimp.databinding.ItemOrderBinding
+import com.example.dried_shrimp.ui.activities.PaymentActivity
 import com.example.dried_shrimp.ui.activities.ReviewActivity
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -50,6 +51,12 @@ class OrderAdapter(
                     btnAction.visibility = if (isSeller) View.GONE else View.VISIBLE
                     btnAction.text = "去付款"
                     btnAction.isEnabled = true
+                    btnAction.setOnClickListener {
+                        val context = holder.itemView.context
+                        val intent = Intent(context, PaymentActivity::class.java)
+                        intent.putExtra("ORDER_DATA", order)
+                        context.startActivity(intent)
+                    }
                 }
                 "TO_SHIP" -> {
                     tvOrderStatus.text = "狀態: 待出貨"
