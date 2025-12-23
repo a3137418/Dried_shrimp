@@ -4,22 +4,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.dried_shrimp.R
 import com.example.dried_shrimp.data.model.Order
+import com.example.dried_shrimp.databinding.FragmentSellerOrderBinding // 自動生成的 Binding 類別
 import com.example.dried_shrimp.ui.adapters.SellerOrderAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class Fragment_SellerOrder : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var tvEmpty: TextView
+    // 🔹 View Binding 宣告
+    private var _binding: FragmentSellerOrderBinding? = null
+    private val binding get() = _binding!!
+
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private lateinit var adapter: SellerOrderAdapter
@@ -43,15 +45,25 @@ class Fragment_SellerOrder : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_seller_order, container, false)
+    ): View {
+        // 🔹 初始化 Binding
+        _binding = FragmentSellerOrderBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        // 綁定 ID
-        recyclerView = view.findViewById(R.id.rv_order_list)
-        tvEmpty = view.findViewById(R.id.tv_empty_orders)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 🔹 修正：處理底部導航列遮擋問題 (解決「下面都被遮到了」)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.layoutTotalSummary) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // 為合計欄位增加底部的系統導航列高度
+            v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, systemBars.bottom)
+            insets
+        }
 
         setupRecyclerView()
-        return view
+        loadSellerOrders()
     }
 
     override fun onResume() {
@@ -60,19 +72,16 @@ class Fragment_SellerOrder : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        // ★★★ 修改重點 1：Adapter 的點擊事件邏輯 ★★★
-        // 假設您的 SellerOrderAdapter 最後一個參數是 (Order) -> Unit
         adapter = SellerOrderAdapter(requireContext(), emptyList()) { order ->
-            // 當賣家點擊按鈕時執行
             if (statusType == "TO_SHIP") {
                 showShipDialog(order)
             }
         }
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = adapter
+        // 🔹 使用 binding 存取元件
+        binding.rvOrderList.layoutManager = LinearLayoutManager(context)
+        binding.rvOrderList.adapter = adapter
     }
 
-    // ★★★ 修改重點 2：新增確認視窗 ★★★
     private fun showShipDialog(order: Order) {
         AlertDialog.Builder(requireContext())
             .setTitle("確認出貨")
@@ -84,32 +93,31 @@ class Fragment_SellerOrder : Fragment() {
             .show()
     }
 
-    // ★★★ 修改重點 3：新增出貨邏輯 (同時更新三個路徑) ★★★
     private fun shipOrder(order: Order) {
         val batch = db.batch()
 
-        // 1. 更新全域訂單
         val globalRef = db.collection("orders").document(order.orderId)
         batch.update(globalRef, "status", "SHIPPED")
 
-        // 2. 更新買家訂單 (users -> buyer -> orders)
         val buyerRef = db.collection("users").document(order.buyerId)
             .collection("orders").document(order.orderId)
         batch.update(buyerRef, "status", "SHIPPED")
 
-        // 3. 更新賣家訂單 (users -> seller -> orders)
         val sellerRef = db.collection("users").document(order.sellerId)
             .collection("orders").document(order.orderId)
         batch.update(sellerRef, "status", "SHIPPED")
 
-        // 執行更新
         batch.commit()
             .addOnSuccessListener {
-                Toast.makeText(context, "出貨成功！", Toast.LENGTH_SHORT).show()
-                loadSellerOrders() // 更新列表
+                if (isAdded) {
+                    Toast.makeText(context, "出貨成功！", Toast.LENGTH_SHORT).show()
+                    loadSellerOrders()
+                }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, "出貨失敗: ${e.message}", Toast.LENGTH_SHORT).show()
+                if (isAdded) {
+                    Toast.makeText(context, "出貨失敗: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
@@ -120,21 +128,41 @@ class Fragment_SellerOrder : Fragment() {
             .whereEqualTo("status", statusType)
             .get()
             .addOnSuccessListener { result ->
+                if (_binding == null) return@addOnSuccessListener
+
                 val list = result.toObjects(Order::class.java)
                 val sortedList = list.sortedByDescending { it.timestamp }
                 adapter.updateData(sortedList)
 
-                if (sortedList.isEmpty()) {
-                    tvEmpty.visibility = View.VISIBLE
-                    recyclerView.visibility = View.GONE
+                // 🔹 合計金額計算邏輯
+                if (statusType == "COMPLETED") {
+                    val total = list.sumOf { it.totalPrice } // 使用 Order.kt 裡的 totalPrice
+                    binding.tvCompletedTotalAmount.text = "$$total"
+                    binding.layoutTotalSummary.visibility = View.VISIBLE
                 } else {
-                    tvEmpty.visibility = View.GONE
-                    recyclerView.visibility = View.VISIBLE
+                    binding.layoutTotalSummary.visibility = View.GONE
+                }
+
+                // 🔹 更新空狀態顯示
+                if (sortedList.isEmpty()) {
+                    binding.tvEmptyOrders.visibility = View.VISIBLE
+                    binding.rvOrderList.visibility = View.GONE
+                } else {
+                    binding.tvEmptyOrders.visibility = View.GONE
+                    binding.rvOrderList.visibility = View.VISIBLE
                 }
             }
-            .addOnFailureListener {
-                tvEmpty.text = "讀取失敗: ${it.message}"
-                tvEmpty.visibility = View.VISIBLE
+            .addOnFailureListener { e ->
+                if (_binding != null) {
+                    binding.tvEmptyOrders.text = "讀取失敗: ${e.message}"
+                    binding.tvEmptyOrders.visibility = View.VISIBLE
+                }
             }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // 🔹 釋放 Binding 避免記憶體洩漏
+        _binding = null
     }
 }
