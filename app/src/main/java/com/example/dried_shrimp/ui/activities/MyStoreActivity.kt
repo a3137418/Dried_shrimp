@@ -2,6 +2,7 @@ package com.example.dried_shrimp.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -29,57 +30,77 @@ class MyStoreActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        // 初始載入
         updateStoreInfo()
         setListeners()
         back()
     }
 
+    // 每次回到頁面時，重新抓取資料 (確保評分是最新的)
+    override fun onResume() {
+        super.onResume()
+        updateStoreInfo()
+    }
+
     private fun updateStoreInfo(){
-        val user = FirebaseAuth.getInstance().currentUser
+        val user = auth.currentUser
         if(user != null){
-            // (A) 設定店名 / 使用者名稱
-            // 假設您的 Layout 裡有一個 TextView 叫 tvStoreName
+            // (A) 設定基本資料 (從 Auth 快速讀取)
             val userName = user.displayName ?: "未命名賣場"
             val userEmail = user.email
             binding.viewUserMystore.tvUserName.text = "${userName} 的賣場"
             binding.viewUserMystore.tvUserEmail.text = userEmail
 
-            // (B) 設定大頭貼 (如果有 Imageview 叫 imgStoreAvatar)
+            // 設定大頭貼
             if (user.photoUrl != null) {
                 Glide.with(this)
                     .load(user.photoUrl)
-                    .circleCrop() // 圓形剪裁
+                    .circleCrop()
                     .into(binding.viewUserMystore.imgMyaccountMystore)
             }
+
+            // (B) 🔥 新增：從 Firestore 讀取賣場評分與數量
+            db.collection("users").document(user.uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        // 讀取 sellerRating (賣家平均分) 和 sellerReviewCount (總評價數)
+                        // 若欄位不存在則預設為 0
+                        val sellerRating = document.getDouble("sellerRating") ?: 0.0
+                        val sellerReviewCount = document.getLong("sellerReviewCount") ?: 0
+
+                        // 綁定到 UI (星星與數字)
+                        binding.viewUserMystore.rbStoreRating.rating = sellerRating.toFloat()
+                        binding.viewUserMystore.tvStoreReviewCount.text = "($sellerReviewCount)"
+
+                        Log.d("MyStoreActivity", "賣場評分已更新: $sellerRating 分, $sellerReviewCount 則評價")
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("MyStoreActivity", "讀取賣場評分失敗", e)
+                }
+
         } else {
-            // 如果意外沒登入卻跑進來，可以趕他出去
             Toast.makeText(this, "請先登入", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
-    // 每次回到頁面時，重新抓取資料 (這樣新增完回來才看得到)
-    override fun onResume() {
-        super.onResume()
-    }
-
 
     private fun setListeners() {
+        // 我的商品管理 (點擊跳轉到 Tab 頁面)
         binding.viewMysotreFunction.MyProducts.setOnClickListener {
-            val intentTab = Intent(this, TabbedMyProductsActivity::class.java)
-            intentTab.putExtra("tab_index", 0)
-            startActivity(intentTab)
-        }
-
-        binding.viewMysotreFunction.MyProducts.setOnClickListener {
-            // 這是原本的商品管理
             val intent = Intent(this, TabbedMyProductsActivity::class.java)
             startActivity(intent)
         }
-        // ★ 新增：前往賣家訂單中心
+
+        // 賣家訂單中心
         binding.viewUserMystore.btnSellerOrders.setOnClickListener {
             val intent = Intent(this, SellerOrderActivity::class.java)
             startActivity(intent)
         }
+
+        // (您可以繼續加入其他按鈕的監聽，例如銷售報表等)
     }
 
     fun back(){

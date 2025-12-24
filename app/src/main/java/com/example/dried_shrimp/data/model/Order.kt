@@ -14,5 +14,6 @@ data class Order(
     val status: String = "",
     val timestamp: Long = 0,
     // 🔥 請新增這行！這是判斷按鈕顯示「去評價」還是「查看評價」的關鍵
-    val hasReviewed: Boolean = false
+    val hasReviewed: Boolean = false,
+    val rating: Double = 0.0,
 ) : Serializable

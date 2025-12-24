@@ -59,7 +59,7 @@ class ReviewActivity : AppCompatActivity() {
             .addOnFailureListener {
                 android.util.Log.e("ReviewActivity", "讀取使用者失敗", it)
             }
-    }5
+    }
 
     private fun submitReview() {
         val rating = binding.ratingBar.rating
@@ -108,12 +108,42 @@ class ReviewActivity : AppCompatActivity() {
         // 4. 提交上述變更
         batch.commit()
             .addOnSuccessListener {
-                // 🔥 成功後，執行這步：更新產品本身的「平均星數」與「評價數」
+                // 1. 更新該商品的平均分 (原本就有的)
                 updateProductRating(targetProductId, rating)
+
+                // 2. 🔥 新增：更新賣家的總平均分
+                updateSellerRating(order.sellerId, rating)
             }
             .addOnFailureListener {
                 Toast.makeText(this, "評價提交失敗: ${it.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+    // 🔥 新增這個函式：用來更新「賣家 (User)」集合裡的評分
+    private fun updateSellerRating(sellerId: String, newRating: Float) {
+        val sellerRef = db.collection("users").document(sellerId)
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(sellerRef)
+
+            // 讀取目前的賣家評價數據
+            // 注意：我們把欄位取名為 sellerRating 和 sellerReviewCount
+            val currentRating = snapshot.getDouble("sellerRating") ?: 0.0
+            val currentCount = snapshot.getLong("sellerReviewCount") ?: 0
+
+            // 計算新的平均分數
+            val newCount = currentCount + 1
+            val totalScore = (currentRating * currentCount) + newRating
+            val newAverageRating = totalScore / newCount
+
+            // 更新賣家文件
+            transaction.update(sellerRef, "sellerRating", newAverageRating)
+            transaction.update(sellerRef, "sellerReviewCount", newCount)
+        }.addOnSuccessListener {
+            // 這裡不用特別跳 Toast，因為 updateProductRating 那邊會跳
+            android.util.Log.d("ReviewActivity", "賣家評分更新成功")
+        }.addOnFailureListener { e ->
+            android.util.Log.e("ReviewActivity", "賣家評分更新失敗", e)
+        }
     }
     // 🔥 新增這個函式：用來更新產品集合裡的數字
     private fun updateProductRating(productId: String, newRating: Float) {

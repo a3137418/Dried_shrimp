@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dried_shrimp.R
 import com.example.dried_shrimp.data.model.Product
-// 1. 引用自動生成的 Binding 類別 (根據您的 layout 檔名 item_guesslike.xml 生成)
 import com.example.dried_shrimp.databinding.ItemGuesslikeBinding
 import com.example.dried_shrimp.ui.activities.ProductDetailActivity
 
@@ -15,12 +14,9 @@ class GuessLikeAdapter(
     private var productList: List<Product>
 ) : RecyclerView.Adapter<GuessLikeAdapter.ViewHolder>() {
 
-    // 2. ViewHolder 改為接收 Binding 物件
-    // 繼承時傳入 binding.root 給父類別
     inner class ViewHolder(val binding: ItemGuesslikeBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        // 3. 使用 Binding 的 inflate 方法載入佈局
         val binding = ItemGuesslikeBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
@@ -31,30 +27,48 @@ class GuessLikeAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val product = productList[position]
-
-        // 4. 使用 binding 存取元件
-        // 注意：這裡的變數名稱會直接對應您 XML 裡的 ID (自動轉為駝峰式命名)
-        // 例如 R.id.textView30 -> binding.textView30
-
+        android.util.Log.e("DebugAdapter", "商品: ${product.name}, 分數: ${product.rating}, 評價數: ${product.reviewCount}")
         holder.binding.apply {
-            textView30.text = product.name           // 原本的 tvName
-            textView33.text = "$${product.price}"    // 原本的 tvPrice
-            textView34.text = "庫存 ${product.stock}" // 原本的 tvStock
+            textView30.text = product.name           // 商品名稱
+            textView33.text = "$${product.price}"    // 價格
+
+            // ==========================================
+            // 🔥 新增：綁定星星分數 (textView31)
+            // ==========================================
+            if (product.rating > 0) {
+                // 有分數：保留一位小數，例如 "4.5"
+                textView31.text = String.format("%.1f", product.rating)
+            } else {
+                // 沒分數：顯示 "New" 或 "0.0"
+                textView31.text = "New"
+            }
+
+            // ==========================================
+            // 🔥 修改：右下角顯示資訊 (textView34)
+            // ==========================================
+            // 您原本是顯示庫存，建議配合星星改成顯示「評價數量」
+            // 如果想改回庫存，請取消註解下面那行
+
+            textView34.text = "評價(${product.reviewCount})"
+            // textView34.text = "庫存 ${product.stock}"
 
             // 處理圖片
             if (product.imageUrl.isNotEmpty()) {
-                Glide.with(root.context) // 可以用 binding.root.context 取得 Context
+                Glide.with(root.context)
                     .load(product.imageUrl)
-                    .into(itemImage)     // 原本的 R.id.item_image -> itemImage
+                    .placeholder(R.drawable.shrimp_icon) // 建議加個預設圖防止閃爍
+                    .into(itemImage)
             } else {
                 itemImage.setImageResource(R.drawable.shrimp_icon)
             }
 
-            // 5. 點擊跳轉
+            // 點擊跳轉
             root.setOnClickListener {
                 val context = root.context
                 val intent = Intent(context, ProductDetailActivity::class.java)
                 intent.putExtra("PRODUCT_DATA", product)
+                // 確保這裡也有傳 PRODUCT_ID (雖然傳了 PRODUCT_DATA 物件通常就有 id)
+                intent.putExtra("PRODUCT_ID", product.id)
                 context.startActivity(intent)
             }
         }

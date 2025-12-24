@@ -29,6 +29,8 @@ class MyProductAdapter(
             tvName.text = product.name
             tvPrice.text = "$${product.price}"
             tvStock.text = "庫存: ${product.stock}"
+            ratingBar.rating = product.rating.toFloat()
+            tvReviewCount.text = "(${product.reviewCount})"
 
             if (product.status == "OFF_SHELF") {
                 // 在未上架列表，這個按鈕顯示為「刪除」

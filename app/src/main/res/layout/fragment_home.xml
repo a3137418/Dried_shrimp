@@ -9,7 +9,6 @@
     android:background="#FF5722"
     tools:context=".ui.fragments.Fragment_Home">
 
-
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
@@ -18,9 +17,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -41,19 +41,14 @@
                         android:ems="10"
                         android:hint="搜尋商品"
                         android:inputType="text"
-
                         android:maxLines="1"
-                        android:imeOptions="actionSearch"
-                        />
+                        android:imeOptions="actionSearch" />
 
                     <ImageView
                         android:id="@+id/img_cart"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-
                         app:srcCompat="@drawable/shopping_cart" />
-
-
                 </LinearLayout>
 
                 <LinearLayout
@@ -176,13 +171,14 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:orientation="vertical">
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycle_home"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
 
             </LinearLayout>
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
