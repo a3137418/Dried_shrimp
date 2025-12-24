@@ -14,5 +14,8 @@ data class Product(
     val shippingFee: Int = 60,        // 運費 (範例預設值)
     val descImageUrl: String = "",
     val status: String = "ON_SHELF",
-    val timestamp: Long = System.currentTimeMillis() // 上架時間
+    val timestamp: Long = System.currentTimeMillis(), // 上架時間
+    // 🔥 新增這兩個欄位 (要有預設值)
+    val rating: Double = 0.0,      // 平均分數
+    val reviewCount: Int = 0       // 評論總數
 ): Serializable

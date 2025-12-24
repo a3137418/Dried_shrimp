@@ -48,9 +48,13 @@ class Fragment_Purchase_list_Returnthegoods: Fragment() {
         loadAllProducts()
         // 2. 訂單列表 (★ 補上)
         val currentUserId = auth.currentUser?.uid ?: ""
-        adapter = OrderAdapter(emptyList(), currentUserId) { order ->
-            // 點擊事件
-        }
+        adapter = OrderAdapter(
+            orders = emptyList(),
+            currentUserId = currentUserId,
+            onActionClick = { _ ->
+            }
+            // onCancelClick 預設為 null，待收貨狀態不需要取消功能，所以不傳
+        )
 
         binding?.recyclePurchaselistReturnthegoods?.apply {
             layoutManager = LinearLayoutManager(context)

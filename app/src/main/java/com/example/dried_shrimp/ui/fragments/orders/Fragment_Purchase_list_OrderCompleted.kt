@@ -37,11 +37,6 @@ class Fragment_Purchase_list_OrderCompleted: Fragment() {
         val currentUserId = auth.currentUser?.uid ?: ""
         Log.d("OrderCompleted", "當前用戶 ID: $currentUserId")
 
-        adapter = OrderAdapter(emptyList(), currentUserId) { order ->
-            val intent = Intent(context, PaymentActivity::class.java)
-            intent.putExtra("ORDER_DATA", order)
-            startActivity(intent)
-        }
         val view = binding?.root
         return view
     }
@@ -65,7 +60,6 @@ class Fragment_Purchase_list_OrderCompleted: Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        Log.d("OrderCompleted", "setupRecyclerViews 開始")
 
         // 1. 設定「猜你喜歡」
         guesslike_Adapter = GuessLikeAdapter(emptyList())
@@ -76,6 +70,17 @@ class Fragment_Purchase_list_OrderCompleted: Fragment() {
         // 2. 設定「已完成訂單列表」
         val currentUserId = auth.currentUser?.uid ?: ""
         Log.d("OrderCompleted", "設定訂單列表，用戶 ID: $currentUserId")
+
+        // 🔥 修正這裡：補上 onActionClick 參數
+        adapter = OrderAdapter(
+            orders = emptyList(),
+            currentUserId = currentUserId,
+            onActionClick = { _ ->
+                // 對於「已完成」訂單，Adapter 內部已經寫好跳轉到 ReviewActivity 的邏輯
+                // 所以這裡不需要做任何事，留空即可
+            }
+            // onCancelClick 預設為 null，這裡不需要傳
+        )
 
         binding?.recyclePurchaselistOrderCompleted?.apply {
             Log.d("OrderCompleted", "RecyclerView 不為 null，開始設定")

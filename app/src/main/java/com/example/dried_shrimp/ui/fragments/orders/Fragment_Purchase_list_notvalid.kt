@@ -48,9 +48,12 @@ class Fragment_Purchase_list_notvalid: Fragment() {
         loadAllProducts()
         // 2. 訂單列表 (★ 補上)
         val currentUserId = auth.currentUser?.uid ?: ""
-        adapter = OrderAdapter(emptyList(), currentUserId) { order ->
-            // 點擊事件
-        }
+        adapter = OrderAdapter(
+            orders = emptyList(),
+            currentUserId = currentUserId,
+            onActionClick = { _ ->
+            }
+        )
 
         binding?.recyclePurchaselistNotvalid?.apply {
             layoutManager = LinearLayoutManager(context)

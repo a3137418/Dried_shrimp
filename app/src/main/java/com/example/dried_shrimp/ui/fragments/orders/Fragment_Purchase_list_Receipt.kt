@@ -51,10 +51,16 @@ class Fragment_Purchase_list_Receipt: Fragment() {
         // 2. 設定訂單列表8
         val currentUserId = auth.currentUser?.uid ?: ""
 
-        adapter = OrderAdapter(emptyList(), currentUserId) { order ->
-            // 點擊按鈕的邏輯：買家點擊「確認收貨」
-            confirmReceipt(order)
-        }
+        // 🔥 修正這裡：明確指定 onActionClick，避免 lambda 跑錯位置
+        adapter = OrderAdapter(
+            orders = emptyList(),
+            currentUserId = currentUserId,
+            onActionClick = { order ->
+                // 點擊按鈕的邏輯：買家點擊「確認收貨」
+                confirmReceipt(order)
+            }
+            // onCancelClick 預設為 null，待收貨狀態不需要取消功能，所以不傳
+        )
         // 請確認 XML 裡的 ID 是否為 recyclePurchaselistPendingReceipt 或類似名稱
         // 如果 XML 裡是 recycle_purchaselist_receipt，請自行調整
         binding?.recyclePurchaselistPendingReceipt?.apply {

@@ -1,78 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginHorizontal="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="1dp"
-    app:cardBackgroundColor="@android:color/white">
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@color/white"
+    android:layout_marginBottom="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgBuyerAvatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp"
+            android:scaleType="centerCrop"
+            android:background="#EEEEEE"
+            android:src="@drawable/user"
+            app:shapeAppearanceOverlay="@style/CircleImageStyle" />
+        <TextView
+            android:id="@+id/tvBuyerName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:text="使用者名稱"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
 
-            <ImageView
-                android:id="@+id/imgUserAvatar"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/shrimp_icon"
-                android:background="@drawable/bg_round_gray"
-                android:scaleType="centerCrop"/>
+        <RatingBar
+            android:id="@+id/ratingBar"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:numStars="5"
+            android:rating="5"
+            android:isIndicator="true" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvReviewerName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="王小明"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"/>
-
-                <RatingBar
-                    android:id="@+id/rbReviewRating"
-                    style="?android:attr/ratingBarStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:numStars="5"
-                    android:stepSize="0.5"
-                    android:isIndicator="true"
-                    android:progressTint="#FFB300"/>
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvReviewDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="2025/12/23"
-                android:textSize="12sp"
-                android:textColor="#888888"/>
-        </LinearLayout>
+        <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
 
         <TextView
-            android:id="@+id/tvReviewContent"
-            android:layout_width="match_parent"
+            android:id="@+id/tvReviewDate"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            tools:text="這東西真的太好用了，出貨速度又快！"
-            android:textSize="14sp"
-            android:textColor="#333333"/>
+            android:text="2023/10/20"
+            android:textSize="12sp"
+            android:textColor="#757575"/>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tvReviewContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:paddingStart="40dp"
+        android:text="評價內容..."
+        android:textColor="#424242"/>
+</LinearLayout>

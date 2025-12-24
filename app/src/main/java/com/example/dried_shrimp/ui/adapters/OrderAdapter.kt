@@ -16,7 +16,8 @@ import java.util.Locale
 class OrderAdapter(
     private var orders: List<Order>,
     private val currentUserId: String, // 傳入當前使用者 ID
-    private val onActionClick: (Order) -> Unit
+    private val onActionClick: (Order) -> Unit,
+    private val onCancelClick: ((Order) -> Unit)? = null
 ) : RecyclerView.Adapter<OrderAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemOrderBinding) : RecyclerView.ViewHolder(binding.root)
@@ -57,6 +58,13 @@ class OrderAdapter(
                         intent.putExtra("ORDER_DATA", order)
                         context.startActivity(intent)
                     }
+                    // 🔥 新增：如果是買家且在待付款狀態，顯示取消按鈕
+                    if (!isSeller) {
+                        btnCancel.visibility = View.VISIBLE
+                        btnCancel.setOnClickListener {
+                            onCancelClick?.invoke(order)
+                        }
+                    }
                 }
                 "TO_SHIP" -> {
                     tvOrderStatus.text = "狀態: 待出貨"
@@ -80,6 +88,12 @@ class OrderAdapter(
                         btnAction.visibility = View.VISIBLE
                         btnAction.text = "確認收貨"
                         btnAction.isEnabled = true
+
+                        // 🔥 修改這裡！讓按鈕點擊時觸發 onActionClick
+                        // 這樣 Fragment 裡的 confirmReceipt 才會被執行
+                        btnAction.setOnClickListener {
+                            onActionClick(order)
+                        }
                     }
                 }
                 "COMPLETED" -> {

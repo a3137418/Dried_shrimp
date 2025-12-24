@@ -49,11 +49,16 @@ class Fragment_Purchase_list_PendingShipment: Fragment() {
         // 2. 訂單列表設定 (★ 補上這裡)
         val currentUserId = auth.currentUser?.uid ?: ""
 
-        adapter = OrderAdapter(emptyList(), currentUserId) { order ->
-            // 待出貨狀態，買家點擊通常只是查看詳情，或是無法點擊
-            // 這裡可以留空，或者跳轉到訂單詳情頁
-            Toast.makeText(context, "等待賣家出貨中", Toast.LENGTH_SHORT).show()
-        }
+        // 🔥 修正這裡：補上 onActionClick 參數
+        adapter = OrderAdapter(
+            orders = emptyList(),
+            currentUserId = currentUserId,
+            onActionClick = { _ ->
+                // 在「待出貨」狀態，買家按鈕通常是鎖住的 (isEnabled = false)
+                // 所以這裡不會被觸發，留空即可
+            }
+            // onCancelClick 預設為 null，待出貨通常不給直接取消，所以不傳
+        )
         binding?.recyclePurchaselistPendingShipment?.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = this@Fragment_Purchase_list_PendingShipment.adapter
